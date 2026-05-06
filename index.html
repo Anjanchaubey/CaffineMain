@@ -31,14 +31,24 @@
   --font-mono: 'Fira Code', monospace;
 }
 
+[data-theme="yellow"] {
+  --ink: #0d0d0d;
+  --paper: #fffef5;
+  --paper2: #fffaeb;
+  --rule: rgba(13,13,13,0.08);
+  --rule-hard: rgba(13,13,13,0.2);
+  --accent: #f5a623;
+  --accent2: #ffd966;
+}
+
 [data-theme="dark"] {
   --ink: #e8e6e3;
   --paper: #0f0f0f;
   --paper2: #1a1a1a;
   --rule: rgba(232,230,227,0.1);
   --rule-hard: rgba(232,230,227,0.24);
-  --accent: #e85d4e;
-  --accent2: #5a7bc7;
+  --accent: #ffd966;
+  --accent2: #f5a623;
 }
 
 html {
@@ -54,6 +64,22 @@ body {
     linear-gradient(135deg, rgba(200,57,43,0.045), transparent 36%),
     linear-gradient(315deg, rgba(44,74,158,0.045), transparent 32%),
     repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+}
+
+[data-theme="yellow"] body {
+  background:
+    linear-gradient(135deg, rgba(245,166,35,0.08), transparent 36%),
+    linear-gradient(315deg, rgba(255,217,102,0.08), transparent 32%),
+    repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+}
+
+[data-theme="yellow"] body::before {
+  background: rgba(245,166,35,0.4);
+}
+
+[data-theme="yellow"] .mini-brand {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 [data-theme="dark"] body {
@@ -109,12 +135,108 @@ body::before {
   border-radius: 50%;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 [data-theme="dark"] .theme-btn { background: rgba(26,26,26,0.7); }
+[data-theme="yellow"] .theme-btn { background: rgba(255,250,235,0.7); }
 .theme-btn:hover { background: var(--ink); color: var(--paper); }
+
+.theme-popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--paper);
+  border: 1.5px solid var(--rule-hard);
+  border-radius: 12px;
+  padding: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.theme-popup.active { display: flex; }
+
+.theme-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.theme-options {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-option {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--rule-hard);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.theme-option:hover {
+  transform: scale(1.1);
+  border-color: var(--ink);
+}
+
+.theme-option.active {
+  border-color: var(--accent);
+  border-width: 3px;
+}
+
+.color-options {
+  display: flex;
+  gap: 8px;
+}
+
+.color-option {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--rule-hard);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-option.active {
+  border-color: var(--ink);
+  border-width: 3px;
+}
+
+.color-option.red {
+  background: linear-gradient(135deg, #c8392b, #e85d4e);
+}
+
+.color-option.yellow {
+  background: linear-gradient(135deg, #f5a623, #ffd966);
+}
 
 .hero {
   flex: 1;
@@ -232,38 +354,85 @@ body::before {
 }
 
 @media (max-width: 680px) {
-  body { overflow-y: auto; }
+  body { overflow: hidden; }
   body::before { left: 16px; }
   .page {
     min-height: 100svh;
-    padding: 18px 14px 18px 30px;
+    max-height: 100svh;
+    padding: 12px 12px 12px 24px;
+    overflow: hidden;
+  }
+  .topbar {
+    margin-bottom: 8px;
+  }
+  .mini-brand {
+    font-size: 8px;
+    padding: 4px 6px;
+  }
+  .theme-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 8px;
   }
   .hero {
-    padding: 56px 0 24px;
+    padding: 0;
     justify-content: flex-start;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
-  .brand { font-size: clamp(62px, 22vw, 92px); }
-  .copy { font-size: 13px; margin-top: 16px; }
-  .chips { margin-top: 18px; }
+  .eyebrow {
+    font-size: 8px;
+    margin-bottom: 8px;
+  }
+  .brand { 
+    max-width: 200px;
+    margin-bottom: 8px;
+  }
+  .copy { 
+    font-size: 11px;
+    margin-top: 8px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .chips { 
+    margin-top: 8px;
+    gap: 6px;
+  }
+  .chip {
+    font-size: 8px;
+    padding: 4px 7px;
+  }
   .dock {
     align-self: stretch;
-    border-radius: 18px;
+    border-radius: 16px;
+    flex-direction: row;
     flex-wrap: wrap;
-    justify-content: stretch;
     gap: 6px;
     padding: 6px;
+    margin-top: 12px;
   }
   .tool {
-    flex: 1 1 calc(33.333% - 6px);
-    min-height: 42px;
-    border-radius: 13px;
-    font-size: 8px;
-    padding: 0 6px;
+    flex: 1 1 calc(50% - 3px);
+    min-height: 52px;
+    border-radius: 12px;
+    font-size: 9px;
+    padding: 8px 6px;
+    flex-direction: column;
+    gap: 4px;
   }
   .tool.ai {
     flex-basis: 100%;
+    flex-direction: row;
+    gap: 6px;
+    background: var(--accent);
+    color: var(--paper);
   }
-  .tool-mark { font-size: 19px; }
+  .tool.ai .tool-mark { color: var(--paper); }
+  .tool-mark { font-size: 20px; }
 }
 </style>
 </head>
@@ -271,12 +440,30 @@ body::before {
   <div class="page">
     <header class="topbar">
       <div class="mini-brand">Caffine Desk</div>
-      <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle dark mode">DM</button>
+      <div style="position: relative;">
+        <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle theme settings">⚙️</button>
+        <div class="theme-popup" id="theme-popup">
+          <div class="theme-section">
+            <div class="theme-label">Mode</div>
+            <div class="theme-options">
+              <div class="theme-option" data-mode="light" title="Light Mode">☀️</div>
+              <div class="theme-option" data-mode="dark" title="Dark Mode">🌙</div>
+            </div>
+          </div>
+          <div class="theme-section">
+            <div class="theme-label">Color</div>
+            <div class="color-options">
+              <div class="color-option red" data-color="red" title="Red/Orange"></div>
+              <div class="color-option yellow" data-color="yellow" title="Yellow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <main class="hero">
       <p class="eyebrow">Study system / planner / tracker</p>
-      <img src="c 2.png" alt="Caffine" class="brand" style="max-width: 400px; height: auto;">
+      <img src="c 2.png" alt="Caffine" class="brand" id="brand-img" style="max-width: 400px; width: 100%; height: auto;">
       <p class="copy">
         A compact home for planning the day, tracking discipline, clearing tasks, and checking JEE progress.
       </p>
@@ -297,21 +484,76 @@ body::before {
   </div>
 
   <script>
-    const savedTheme = localStorage.getItem('caffine-main-theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      document.documentElement.dataset.theme = 'dark';
-    }
-
-    document.getElementById('theme-btn').addEventListener('click', () => {
-      const isDark = document.documentElement.dataset.theme === 'dark';
-      if (isDark) {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('caffine-main-theme', 'light');
-      } else {
+    const savedMode = localStorage.getItem('caffine-mode') || 'light';
+    const savedColor = localStorage.getItem('caffine-color') || 'red';
+    
+    const applyTheme = (mode, color) => {
+      const brandImg = document.getElementById('brand-img');
+      
+      if (mode === 'dark') {
         document.documentElement.dataset.theme = 'dark';
-        localStorage.setItem('caffine-main-theme', 'dark');
+      } else if (color === 'yellow') {
+        document.documentElement.dataset.theme = 'yellow';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
       }
+      
+      // Update image based on color
+      if (color === 'yellow') {
+        brandImg.src = 'C (5).png';
+      } else {
+        brandImg.src = 'c 2.png';
+      }
+    };
+
+    applyTheme(savedMode, savedColor);
+
+    const themeBtn = document.getElementById('theme-btn');
+    const themePopup = document.getElementById('theme-popup');
+    const modeOptions = document.querySelectorAll('.theme-option');
+    const colorOptions = document.querySelectorAll('.color-option');
+
+    let currentMode = savedMode;
+    let currentColor = savedColor;
+
+    const updateActive = () => {
+      modeOptions.forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.mode === currentMode);
+      });
+      colorOptions.forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.color === currentColor);
+      });
+    };
+
+    updateActive();
+
+    themeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      themePopup.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!themePopup.contains(e.target) && e.target !== themeBtn) {
+        themePopup.classList.remove('active');
+      }
+    });
+
+    modeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        currentMode = opt.dataset.mode;
+        localStorage.setItem('caffine-mode', currentMode);
+        applyTheme(currentMode, currentColor);
+        updateActive();
+      });
+    });
+
+    colorOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        currentColor = opt.dataset.color;
+        localStorage.setItem('caffine-color', currentColor);
+        applyTheme(currentMode, currentColor);
+        updateActive();
+      });
     });
   </script>
 </body>
