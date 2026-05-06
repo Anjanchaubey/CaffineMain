@@ -1,0 +1,2108 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caffine: Ramindance Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Epilogue:wght@300;400;500;700;900&family=Fira+Code:wght@300;400;500&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- iOS Home Screen Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    
+    <!-- Standard favicon for browser tabs -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    
+    <!-- Fallback SVG favicon -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 8h1a4 4 0 0 1 0 8h-1'/%3E%3Cpath d='M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z'/%3E%3Cline x1='6' y1='1' x2='6' y2='4'/%3E%3Cline x1='10' y1='1' x2='10' y2='4'/%3E%3Cline x1='14' y1='1' x2='14' y2='4'/%3E%3C/svg%3E">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        if (typeof tailwind === 'undefined') {
+            console.warn('Tailwind CSS not loaded (offline).');
+        } else {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                            serif: ['Inter', 'sans-serif'],
+                            mono: ['Inter', 'monospace'],
+                        },
+                        animation: {
+                            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                            'fadeIn': 'fadeIn 0.2s ease-out',
+                            'progress': 'progress 3s linear'
+                        },
+                        keyframes: {
+                            fadeIn: {
+                                '0%': { opacity: '0', transform: 'scale(0.95)' },
+                                '100%': { opacity: '1', transform: 'scale(1)' },
+                            },
+                            progress: {
+                                '0%': { width: '0%' },
+                                '100%': { width: '100%' },
+                            }
+                        },
+                        colors: {
+                            card: '#1a1a1a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --paper: #f5f2eb;
+            --paper2: #edeae0;
+            --rule: rgba(13,13,13,0.1);
+            --rule-hard: rgba(13,13,13,0.24);
+            --accent: #c8392b;
+            --accent2: #2c4a9e;
+            --gold: #c9a84c;
+            --font-display: 'Bebas Neue', sans-serif;
+            --font-body: 'Epilogue', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+        .dark {
+            --ink: #e8e6e3;
+            --paper: #0f0f0f;
+            --paper2: #1a1a1a;
+            --rule: rgba(232,230,227,0.1);
+            --rule-hard: rgba(232,230,227,0.24);
+            --accent: #e85d4e;
+            --accent2: #5a7bc7;
+            --gold: #d4af37;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Theme base */
+        html { background-color: var(--paper); }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            background-color: var(--paper);
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+            color: var(--ink);
+        }
+        body:not(.dark) {
+            background-color: var(--paper);
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 28px;
+            width: 1px;
+            background: rgba(200,57,43,0.35);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        * {
+            transition-property: background-color, border-color, color, fill, stroke, width, opacity;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+        html, body, * {
+            font-family: var(--font-body) !important;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+        button, input, select, textarea { font-family: var(--font-body) !important; }
+        h1, h2, h3 { font-family: var(--font-display) !important; letter-spacing: 0.03em; }
+
+        #app {
+            position: relative;
+            z-index: 1;
+        }
+
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--paper);
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.5s ease;
+        }
+        .dark #splash-screen { background-color: var(--paper); }
+        #splash-screen.fade-out { opacity: 0; pointer-events: none; }
+        #splash-logo {
+            width: 120px; height: 120px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Tracker Styles */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        .dark .glass-header {
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid #f59e0b;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .soft-card {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        .dark .soft-card {
+            background-color: #1a1a1a;
+            box-shadow: none;
+            border: 1px solid #f59e0b;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .progress-transition {
+            transition: width 1.0s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* STB-inspired refinement layer */
+        #app > header {
+            border-bottom: 1.5px solid var(--rule-hard);
+            padding-bottom: 18px;
+        }
+        #app > header h1 {
+            align-items: flex-end;
+            color: var(--ink) !important;
+            line-height: 0.92;
+        }
+        #app > header h1 svg {
+            width: 34px;
+            height: 34px;
+            color: var(--accent) !important;
+            stroke-width: 1.7;
+            margin-bottom: 4px;
+        }
+        #app > header h1 .text-2xl {
+            font-family: var(--font-display) !important;
+            font-size: clamp(40px, 7vw, 64px) !important;
+            font-weight: 400 !important;
+            letter-spacing: 0.03em;
+            color: var(--ink) !important;
+            line-height: 0.88;
+        }
+        #app > header h1 .text-xs,
+        #current-date-display,
+        #start-date-display,
+        #user-status-text,
+        #grid-legend,
+        #grid-legend *,
+        .uppercase {
+            font-family: var(--font-mono) !important;
+            letter-spacing: 0.11em;
+        }
+        #app > header h1 .text-xs {
+            color: var(--accent) !important;
+            font-size: 9px !important;
+            margin-top: 3px;
+        }
+        #current-date-display {
+            color: var(--accent2) !important;
+            font-size: 10px !important;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        #start-date-display {
+            color: var(--ink) !important;
+            opacity: 0.62;
+            font-size: 11px !important;
+        }
+        #duration-container {
+            background: transparent !important;
+            border: 1.5px solid var(--rule-hard);
+            border-radius: 3px !important;
+            padding: 4px !important;
+            gap: 4px;
+        }
+        #duration-container button {
+            border-radius: 2px !important;
+            font-family: var(--font-mono) !important;
+            font-size: 10px !important;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink) !important;
+            opacity: 0.62;
+            box-shadow: none !important;
+        }
+        #duration-container button.bg-white,
+        .dark #duration-container button.dark\:bg-amber-800 {
+            background: var(--ink) !important;
+            color: var(--paper) !important;
+            opacity: 1;
+        }
+
+        #profile-btn,
+        #profile-btn-mobile {
+            border-radius: 3px !important;
+            border: 1.5px solid var(--rule-hard);
+            background: transparent !important;
+            color: var(--ink) !important;
+        }
+
+        #app .grid.grid-cols-2 > div,
+        #streak-card {
+            border-radius: 6px !important;
+            border: 1.5px solid var(--rule-hard) !important;
+            background: rgba(245,242,235,0.72) !important;
+            box-shadow: none !important;
+        }
+        .dark #app .grid.grid-cols-2 > div,
+        .dark #streak-card {
+            background: rgba(26,26,26,0.78) !important;
+        }
+        #app .grid.grid-cols-2 span[id^="stat-"],
+        #streak-card .text-3xl {
+            font-family: var(--font-display) !important;
+            color: var(--ink) !important;
+            font-weight: 400 !important;
+            letter-spacing: 0.03em;
+        }
+        #app .grid.grid-cols-2 .uppercase,
+        #streak-card .uppercase {
+            color: var(--ink) !important;
+            opacity: 0.52;
+            font-weight: 500 !important;
+        }
+
+        #app > div.bg-white {
+            border-radius: 8px !important;
+            border: 1.5px solid var(--rule-hard) !important;
+            background:
+                linear-gradient(135deg, rgba(200,57,43,0.05), transparent 34%),
+                linear-gradient(315deg, rgba(44,74,158,0.05), transparent 30%),
+                rgba(245,242,235,0.78) !important;
+            box-shadow: none !important;
+        }
+        .dark #app > div.bg-white {
+            background:
+                linear-gradient(135deg, rgba(232,93,78,0.07), transparent 34%),
+                linear-gradient(315deg, rgba(90,123,199,0.07), transparent 30%),
+                rgba(15,15,15,0.86) !important;
+        }
+        #app > div.bg-white > .absolute {
+            display: none !important;
+        }
+        #grid-container button {
+            border-radius: 3px !important;
+            box-shadow: none !important;
+            font-family: var(--font-mono) !important;
+            letter-spacing: 0.04em;
+        }
+        #grid-container button:active {
+            transform: translateX(2px) !important;
+        }
+        #grid-legend {
+            border-top-color: var(--rule-hard) !important;
+            color: var(--ink) !important;
+            opacity: 0.62;
+        }
+
+        #start-challenge-section input,
+        #profile-modal input,
+        #profile-modal select,
+        #popup-backdrop input,
+        #popup-backdrop textarea {
+            border-radius: 3px !important;
+            border: 1.5px solid var(--rule-hard) !important;
+            background: transparent !important;
+            color: var(--ink) !important;
+        }
+        #confirm-start-date-inline,
+        #confirm-start-date,
+        #btn-signin,
+        #btn-signup,
+        #logout-btn,
+        #btn-sync-timeline,
+        #btn-reset-db,
+        #btn-unlock,
+        #app a {
+            border-radius: 3px !important;
+            box-shadow: none !important;
+            font-family: var(--font-mono) !important;
+            letter-spacing: 0.08em;
+        }
+        #confirm-start-date-inline,
+        #confirm-start-date,
+        #btn-signin {
+            background: var(--ink) !important;
+            color: var(--paper) !important;
+        }
+        #app a {
+            background: transparent !important;
+            border: 1.5px solid var(--rule-hard) !important;
+            color: var(--ink) !important;
+        }
+        #app a span,
+        #app a i {
+            color: var(--ink) !important;
+        }
+        #profile-modal > div,
+        #popup-backdrop > div,
+        #start-date-modal > div {
+            border-radius: 8px !important;
+            border: 1.5px solid var(--rule-hard) !important;
+            background: var(--paper) !important;
+            color: var(--ink) !important;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18) !important;
+        }
+
+        @media (max-width: 640px) {
+            body::before { left: 16px; }
+            #app { padding-left: 28px !important; }
+            #app > header h1 .text-2xl { font-size: 42px !important; }
+            #duration-container { width: auto !important; }
+            #duration-container button { padding-left: 10px !important; padding-right: 10px !important; }
+            #app > div.bg-white { padding: 16px !important; }
+        }
+    </style>
+</head>
+<body class="dark text-slate-800 dark:text-amber-300 font-sans selection:bg-amber-400 selection:text-black transition-colors duration-500">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <svg id="splash-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600 dark:text-amber-400">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+        </svg>
+        <h1 class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-4">Caffine: Ramindance</h1>
+        <p class="text-xs text-amber-800/60 dark:text-amber-400/60 mt-2 font-medium">45 Days of Discipline</p>
+    </div>
+
+    <!-- App Container -->
+    <div id="app" class="max-w-5xl mx-auto px-4 pt-6 md:px-12 md:pt-12">
+        
+        <!-- Header -->
+        <header class="mb-6 flex flex-col gap-5 md:flex-row md:items-end justify-between">
+            <div class="flex items-start justify-between w-full md:w-auto">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-amber-300 flex items-center gap-3">
+                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600 dark:text-amber-400">
+                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                            <line x1="6" y1="1" x2="6" y2="4"></line>
+                            <line x1="10" y1="1" x2="10" y2="4"></line>
+                            <line x1="14" y1="1" x2="14" y2="4"></line>
+                        </svg>
+                        <div class="flex flex-col">
+                            <span class="text-2xl">Caffine</span>
+                            <span class="text-xs text-amber-600 dark:text-amber-400 font-bold -mt-1">RAMINDANCE EDITION</span>
+                        </div>
+                    </h1>
+                    <div id="current-date-display" class="text-xs text-blue-900 dark:text-blue-400 font-medium mt-1">
+                        <!-- Date injected by JS -->
+                    </div>
+                    <div class="flex items-center gap-3 mt-1">
+                        <p id="start-date-display" class="text-slate-700 dark:text-amber-200 text-sm font-medium">
+                            Loading...
+                        </p>
+                        <div class="flex items-center gap-2 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-900/50">
+                            <div id="user-status-dot" class="w-2 h-2 rounded-full bg-slate-300 transition-colors"></div>
+                            <span id="user-status-text" class="text-xs font-bold text-slate-500 dark:text-slate-400">Checking...</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mobile Actions -->
+                <div class="md:hidden flex gap-2">
+                    <button id="profile-btn-mobile" class="p-2.5 rounded-full bg-amber-100 dark:bg-amber-900 text-slate-600 dark:text-amber-300 active:scale-95 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col-reverse md:flex-row md:items-center gap-4">
+                <div id="duration-container" class="flex bg-amber-100 dark:bg-amber-900 p-1.5 rounded-xl overflow-x-auto w-full md:w-auto scrollbar-hide">
+                    <!-- Buttons injected by JS -->
+                </div>
+                <div class="hidden md:flex gap-2">
+                    <button id="profile-btn" class="p-3 rounded-full hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors text-slate-600 dark:text-amber-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Offline Banner -->
+        <div id="offline-banner" class="hidden mb-6 p-3 bg-slate-800 text-white dark:bg-amber-900/40 dark:text-amber-200 rounded-lg text-sm font-medium flex items-center justify-center gap-2 animate-fadeIn">
+            <i data-lucide="wifi-off" class="w-4 h-4"></i>
+            <span>You are offline. Changes saved locally.</span>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
+            <!-- Streak Card -->
+            <div id="streak-card" class="col-span-2 md:col-span-1 flex flex-col p-4 rounded-2xl border border-amber-100 dark:border-amber-800 transition-all duration-500 relative overflow-hidden bg-amber-50 dark:bg-amber-950/20">
+                <!-- Content Injected JS -->
+            </div>
+
+            <!-- Total Hours Card -->
+            <div class="flex flex-col p-4 rounded-2xl border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20">
+                <div class="mb-2 text-amber-500"><i data-lucide="clock" size="18"></i></div>
+                <span id="stat-total-hours" class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-amber-300 tracking-tight">0h</span>
+                <span class="text-[10px] md:text-xs text-slate-500 dark:text-amber-400 font-bold uppercase tracking-wider opacity-80">Total Hours</span>
+            </div>
+
+            <!-- Days Logged Card -->
+            <div class="flex flex-col p-4 rounded-2xl border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20">
+                <div class="mb-2 text-amber-500"><i data-lucide="calendar" size="18"></i></div>
+                <span id="stat-days-logged" class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-amber-300 tracking-tight">0</span>
+                <span class="text-[10px] md:text-xs text-slate-500 dark:text-amber-400 font-bold uppercase tracking-wider opacity-80">Days Logged</span>
+            </div>
+        </div>
+
+        <!-- The Grid -->
+        <div class="bg-white dark:bg-black p-4 md:p-8 rounded-[2rem] shadow-xl shadow-amber-200/50 dark:shadow-none border border-amber-100 dark:border-amber-800/50 relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-amber-400/10 rounded-full blur-[100px] pointer-events-none"></div>
+            
+            <!-- Start Challenge Section (shown when no start date) -->
+            <div id="start-challenge-section" class="hidden relative z-10">
+                <div class="text-center mb-6">
+                    <div class="text-5xl mb-4">🔥</div>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-amber-300 mb-2">Welcome to Caffine: Ramindance!</h2>
+                    <p class="text-sm text-slate-600 dark:text-amber-400">Choose your challenge: 45, 90, or 180 days of discipline</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="text-sm font-bold text-slate-700 dark:text-amber-300 mb-3 block">When do you want to start?</label>
+                    <input type="date" id="start-date-input-inline" class="w-full p-4 rounded-xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/20 text-slate-900 dark:text-amber-300 focus:ring-2 focus:ring-amber-500 outline-none text-center font-bold" />
+                </div>
+                
+                <div class="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl mb-6 text-xs text-slate-600 dark:text-amber-400 space-y-2">
+                    <p><strong>Ramindance Rules:</strong></p>
+                    <p>✓ Fixed sleep & wake times</p>
+                    <p>✓ Screen only for work/study (45 min max entertainment)</p>
+                    <p>✓ First 20% days: Comfgoria (70% intensity)</p>
+                    <p>✓ Remaining days: Brutodis (100% savage mode)</p>
+                    <p>✓ At least 8 hours on yourself daily</p>
+                    <p>✓ Journal before sleep</p>
+                    <p>✓ Track screen time daily</p>
+                </div>
+                
+                <button id="confirm-start-date-inline" class="w-full p-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-lg transition-colors shadow-lg shadow-amber-500/30">
+                    Start My Journey 🚀
+                </button>
+            </div>
+            
+            <!-- Grid Container (shown when start date is set) -->
+            <div id="grid-container" class="grid gap-1.5 md:gap-3 transition-all duration-500 relative z-10" style="grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));">
+                <!-- Blocks injected by JS -->
+            </div>
+            
+            <!-- Legend -->
+            <div id="grid-legend" class="mt-8 pt-6 border-t border-amber-100 dark:border-amber-800 flex overflow-x-auto pb-2 scrollbar-hide items-center md:justify-center gap-6 text-[10px] md:text-xs text-slate-500 dark:text-amber-400 font-semibold whitespace-nowrap">
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-100 dark:bg-amber-800"></div><span>0h</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-300"></div><span>1-2h</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-purple-400"></div><span>3-4h</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-cyan-400"></div><span>5-6h</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-500"></div><span>7-8h</span></div>
+                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-gradient-to-r from-pink-500 to-violet-600"></div><span>9h+</span></div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center text-slate-400 dark:text-amber-500 text-xs font-medium md:hidden">
+            Long press any block for details
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="mt-8 mb-8 flex gap-4 justify-center">
+            <a class='flex items-center gap-2 px-6 py-3 bg-amber-100 dark:bg-amber-900 hover:bg-amber-200 dark:hover:bg-amber-800 rounded-xl border border-amber-200 dark:border-amber-700 transition-colors' href='/tracker'>
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
+                <span class="text-sm font-bold text-amber-900 dark:text-amber-300">Tracker</span>
+            </a>
+            <a class='flex items-center gap-2 px-6 py-3 bg-amber-100 dark:bg-amber-900 hover:bg-amber-200 dark:hover:bg-amber-800 rounded-xl border border-amber-200 dark:border-amber-700 transition-colors' href='/planner'>
+                <i data-lucide="calendar-clock" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
+                <span class="text-sm font-bold text-amber-900 dark:text-amber-300">Planner</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+        <div class="bg-white dark:bg-black w-full max-w-sm p-6 rounded-3xl shadow-2xl border border-amber-100 dark:border-amber-800">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-slate-900 dark:text-amber-300">Profile</h3>
+                <button id="close-profile" class="p-2 hover:bg-amber-100 dark:hover:bg-amber-800 rounded-full transition-colors">
+                    <i data-lucide="x" class="text-slate-500 dark:text-amber-300 w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-xl">
+                    <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-lg">
+                        <i data-lucide="user" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs text-slate-500 dark:text-amber-400 font-medium">Account</p>
+                        <p id="user-email" class="text-sm font-semibold text-slate-900 dark:text-amber-300 truncate">Guest / Offline</p>
+                    </div>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="auth-form" class="space-y-3 pt-2">
+                    <!-- Theme Selector for Guests -->
+                    <div class="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-100 dark:border-amber-900/20 mb-3">
+                        <label class="text-xs font-bold text-slate-600 dark:text-amber-400 mb-2 block">Theme</label>
+                        <div class="flex gap-2">
+                            <select id="theme-palette-guest" onchange="setThemePalette(this.value)" class="flex-1 p-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-white dark:bg-amber-950/20 text-slate-900 dark:text-amber-300 focus:ring-2 focus:ring-amber-400 outline-none text-sm font-semibold">
+                                <option value="amber">🟡 Amber</option>
+                                <option value="blue">🔵 Ocean</option>
+                                <option value="purple">🟣 Purple</option>
+                                <option value="green">🟢 Forest</option>
+                                <option value="rose">🔴 Rose</option>
+                                <option value="slate">⚫ Mono</option>
+                            </select>
+                            <button id="theme-toggle-guest" onclick="setThemeMode(!window.state.darkMode)" class="p-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-white dark:bg-amber-950/20 hover:scale-105 transition-transform">
+                                <i data-lucide="sun" class="w-5 h-5 text-amber-600 dark:text-amber-400 dark:hidden"></i>
+                                <i data-lucide="moon" class="w-5 h-5 text-amber-600 dark:text-amber-400 hidden dark:block"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <input type="email" id="auth-email" placeholder="Email Address" class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-400 outline-none transition-all text-sm" />
+                    <input type="password" id="auth-password" placeholder="Password" class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-400 outline-none transition-all text-sm" />
+                    
+                    <div class="flex gap-2 pt-1">
+                         <button id="btn-signin" class="flex-1 p-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition-colors text-sm shadow-lg shadow-amber-500/20">Login</button>
+                         <button id="btn-signup" class="flex-1 p-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl font-bold transition-colors text-sm">Sign Up</button>
+                    </div>
+                    <p id="auth-error" class="text-red-500 text-xs text-center hidden font-medium mt-2 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg"></p>
+                </div>
+
+                <div id="logged-in-actions" class="hidden space-y-3">
+                    <!-- Theme Selector -->
+                    <div class="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-100 dark:border-amber-900/20">
+                        <label class="text-xs font-bold text-slate-600 dark:text-amber-400 mb-2 block">Theme</label>
+                        <div class="flex gap-2">
+                            <select id="theme-palette-logged" onchange="setThemePalette(this.value)" class="flex-1 p-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-white dark:bg-amber-950/20 text-slate-900 dark:text-amber-300 focus:ring-2 focus:ring-amber-400 outline-none text-sm font-semibold">
+                                <option value="amber">🟡 Amber</option>
+                                <option value="blue">🔵 Ocean</option>
+                                <option value="purple">🟣 Purple</option>
+                                <option value="green">🟢 Forest</option>
+                                <option value="rose">🔴 Rose</option>
+                                <option value="slate">⚫ Mono</option>
+                            </select>
+                            <button id="theme-toggle-logged" onclick="setThemeMode(!window.state.darkMode)" class="p-2 rounded-lg border-2 border-amber-200 dark:border-amber-800 bg-white dark:bg-amber-950/20 hover:scale-105 transition-transform">
+                                <i data-lucide="sun" class="w-5 h-5 text-amber-600 dark:text-amber-400 dark:hidden"></i>
+                                <i data-lucide="moon" class="w-5 h-5 text-amber-600 dark:text-amber-400 hidden dark:block"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="btn-sync-timeline" class="w-full flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-900/10 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors border border-amber-100 dark:border-amber-900/20">
+                         <div class="flex items-center gap-3">
+                            <div class="p-1.5 bg-amber-100 dark:bg-amber-900/50 rounded-lg text-amber-600 dark:text-amber-400">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </div>
+                            <div class="text-left">
+                                <span class="block text-sm font-semibold text-slate-700 dark:text-amber-200">Sync Timeline</span>
+                                <span class="block text-[10px] text-slate-400 dark:text-amber-500/60">Restore start date from history</span>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button id="btn-reset-db" class="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-950/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors border border-red-100 dark:border-red-900/20">
+                        <div class="flex items-center gap-3">
+                            <div class="p-1.5 bg-red-100 dark:bg-red-900/50 rounded-lg text-red-600 dark:text-red-400">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </div>
+                            <div class="text-left">
+                                <span class="block text-sm font-semibold text-red-600 dark:text-red-400">Reset Database</span>
+                                <span class="block text-[10px] text-red-400 dark:text-red-500/60">Delete all entries permanently</span>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button id="logout-btn" class="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-950/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="log-out" class="w-5 h-5 text-red-600 dark:text-red-400"></i>
+                            <span class="text-sm font-medium text-red-600 dark:text-red-400">Logout</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Popup -->
+    <div id="popup-backdrop" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
+        <div class="bg-white dark:bg-black w-full max-w-xs p-6 rounded-3xl shadow-2xl border border-amber-100 dark:border-amber-800 transform transition-all scale-100 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 id="popup-date" class="text-xl font-bold text-slate-900 dark:text-amber-300 tracking-tight">Date</h3>
+                    <p id="popup-status" class="text-sm text-slate-500 dark:text-amber-300 font-medium">Status</p>
+                </div>
+                <button id="popup-close" class="p-2 hover:bg-amber-100 dark:hover:bg-amber-800 rounded-full transition-colors">
+                    <i data-lucide="x" class="text-slate-500 dark:text-amber-300 w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="flex items-center gap-5 mb-6">
+                <div id="popup-hours-box" class="relative w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold shadow-inner transition-colors duration-300">
+                    <span id="popup-hours-val">0</span><span class="text-sm font-medium opacity-60 ml-0.5 mt-2">h</span>
+                    <div id="popup-unlocked-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white dark:border-zinc-950 rounded-full"></div>
+                </div>
+                <div class="flex-1">
+                    <div id="popup-text-desc" class="text-sm font-semibold text-slate-700 dark:text-amber-200">No Activity</div>
+                    <div class="w-full bg-amber-100 dark:bg-amber-900 rounded-full h-2 mt-2 overflow-hidden">
+                        <div id="popup-progress-bar" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Study Hours Slider -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-slate-600 dark:text-amber-400">Study Hours</label>
+                    <span id="study-hours-display" class="text-sm font-bold text-blue-900 dark:text-blue-400">0h</span>
+                </div>
+                <input type="range" id="popup-study-hours" min="0" max="14" step="1" class="w-full h-3 bg-amber-200 dark:bg-amber-900 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+            </div>
+            
+            <!-- Screen Time Input -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-slate-600 dark:text-amber-400">Screen Time</label>
+                    <span id="screen-time-display" class="text-xs font-bold text-blue-900 dark:text-blue-400">0 min</span>
+                </div>
+                <input type="range" id="popup-screen-time" min="0" max="720" step="15" class="w-full h-2 bg-amber-200 dark:bg-amber-900 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+            </div>
+            
+            <!-- Workout Time Input -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-slate-600 dark:text-amber-400">Workout Time</label>
+                    <span id="workout-time-display" class="text-xs font-bold text-blue-900 dark:text-blue-400">0 min</span>
+                </div>
+                <input type="range" id="popup-workout-time" min="0" max="120" step="5" class="w-full h-2 bg-amber-200 dark:bg-amber-900 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+            </div>
+            
+            <!-- Water Glasses Input -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-bold text-slate-600 dark:text-amber-400">Water Intake</label>
+                    <span id="water-glasses-display" class="text-xs font-bold text-blue-900 dark:text-blue-400">0 glasses</span>
+                </div>
+                <input type="range" id="popup-water-glasses" min="0" max="12" step="1" class="w-full h-2 bg-amber-200 dark:bg-amber-900 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+            </div>
+            
+            <!-- Journal Input -->
+            <div class="mb-6">
+                <label class="text-xs font-bold text-slate-600 dark:text-amber-400 mb-2 block">Daily Journal</label>
+                <textarea id="popup-journal" rows="4" class="w-full p-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 text-slate-900 dark:text-amber-300 focus:ring-2 focus:ring-amber-400 outline-none resize-none" placeholder="How was your day?"></textarea>
+            </div>
+            
+            <button id="btn-unlock" class="w-full flex items-center justify-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/10 py-3 rounded-xl border border-amber-100 dark:border-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                <span>Unlock to Edit</span>
+            </button>
+            <div id="msg-future" class="hidden text-xs text-center font-medium text-slate-400 dark:text-amber-500 py-3">Future dates cannot be edited yet.</div>
+        </div>
+    </div>
+
+    <!-- Start Date Modal -->
+    <div id="start-date-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+        <div class="bg-white dark:bg-black w-full max-w-md p-8 rounded-3xl shadow-2xl border-2 border-amber-400 dark:border-amber-600 animate-fadeIn">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🔥</div>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-amber-300 mb-2">Welcome to Caffine: Ramindance!</h2>
+                <p class="text-sm text-slate-600 dark:text-amber-400">Choose your challenge: 45, 90, or 180 days of discipline</p>
+            </div>
+            
+            <div class="mb-6">
+                <label class="text-sm font-bold text-slate-700 dark:text-amber-300 mb-3 block">When do you want to start?</label>
+                <input type="date" id="start-date-input" class="w-full p-4 rounded-xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/20 text-slate-900 dark:text-amber-300 focus:ring-2 focus:ring-amber-500 outline-none text-center font-bold" />
+            </div>
+            
+            <div class="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl mb-6 text-xs text-slate-600 dark:text-amber-400 space-y-2">
+                <p><strong>Ramindance Rules:</strong></p>
+                <p>✓ Fixed sleep & wake times</p>
+                <p>✓ Screen only for work/study (45 min max entertainment)</p>
+                <p>✓ First 20% days: Comfgoria (70% intensity)</p>
+                <p>✓ Remaining days: Brutodis (100% savage mode)</p>
+                <p>✓ At least 8 hours on yourself daily</p>
+                <p>✓ Journal before sleep</p>
+                <p>✓ Track screen time daily</p>
+            </div>
+            
+            <button id="confirm-start-date" class="w-full p-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-lg transition-colors shadow-lg shadow-amber-500/30">
+                Start My Journey 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div id="celebration-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm pointer-events-none">
+        <div class="bg-gradient-to-br from-amber-400 to-orange-500 p-8 rounded-3xl shadow-2xl transform scale-110 animate-pulse">
+            <div class="text-center">
+                <div class="text-6xl mb-4">🎉🔥🎊</div>
+                <h2 id="celebration-message" class="text-3xl font-bold text-white drop-shadow-lg">10 Day Streak!</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script type="module">
+        // Global variables used by the app
+        let app, auth, db;
+        let initializeApp, getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously;
+        let getFirestore, doc, setDoc, onSnapshot, getDoc, deleteDoc;
+        let firebaseLoaded = false;
+        let initialCloudSyncComplete = false; // Guard for data overwrite
+
+        // --- Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYY2GQqS0tCXb7Oxw8AWXhpexq9e8VRUs",
+            authDomain: "aspirehub-32863.firebaseapp.com",
+            projectId: "aspirehub-32863",
+            storageBucket: "aspirehub-32863.appspot.com",
+            messagingSenderId: "686810111182",
+            appId: "1:686810111182:web:4290b4b1b6e64934ec449f",
+        };
+        const appId = 'caffine-ramindance-v1';
+
+        // --- Start Date Selection Modal ---
+        function showStartChallengeSection() {
+            const section = document.getElementById('start-challenge-section');
+            const grid = document.getElementById('grid-container');
+            const legend = document.getElementById('grid-legend');
+            if (section) section.classList.remove('hidden');
+            if (grid) grid.classList.add('hidden');
+            if (legend) legend.classList.add('hidden');
+        }
+
+        function hideStartChallengeSection() {
+            const section = document.getElementById('start-challenge-section');
+            const grid = document.getElementById('grid-container');
+            const legend = document.getElementById('grid-legend');
+            if (section) section.classList.add('hidden');
+            if (grid) grid.classList.remove('hidden');
+            if (legend) legend.classList.remove('hidden');
+        }
+
+        // --- Celebration Modal ---
+        function showCelebration(streakDays) {
+            const modal = document.getElementById('celebration-modal');
+            const message = document.getElementById('celebration-message');
+            if (modal && message) {
+                message.textContent = `🎉 ${streakDays} Day Streak! Keep Going! 🔥`;
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.add('hidden'), 4000);
+            }
+        }
+
+        // --- Core Init ---
+        // We use dynamic imports to prevent the entire script from crashing if internet is down.
+        async function initApp() {
+            try {
+                // Try importing Firebase
+                const fbApp = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
+                const fbAuth = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
+                const fbStore = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+                // Assign to global variables
+                initializeApp = fbApp.initializeApp;
+                getAuth = fbAuth.getAuth;
+                signInWithEmailAndPassword = fbAuth.signInWithEmailAndPassword;
+                createUserWithEmailAndPassword = fbAuth.createUserWithEmailAndPassword;
+                signOut = fbAuth.signOut;
+                onAuthStateChanged = fbAuth.onAuthStateChanged;
+                signInAnonymously = fbAuth.signInAnonymously;
+                getFirestore = fbStore.getFirestore;
+                doc = fbStore.doc;
+                setDoc = fbStore.setDoc;
+                onSnapshot = fbStore.onSnapshot;
+                getDoc = fbStore.getDoc;
+                deleteDoc = fbStore.deleteDoc;
+
+                // Initialize
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                firebaseLoaded = true;
+
+                // Setup Auth Listener
+                setupAuthListener();
+
+            } catch (error) {
+                console.warn("Firebase failed to load (Offline). App running in local-only mode.");
+                updateUserStatus('offline');
+                if (document.getElementById('user-email')) document.getElementById('user-email').textContent = "Offline Mode";
+            }
+
+            // Always render local data
+            renderAll();
+            
+            // Safe safe to remove splash
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash) splash.classList.add('fade-out');
+            }, 1000);
+        }
+
+        // --- Status UI ---
+        const statusDot = document.getElementById('user-status-dot');
+        const statusText = document.getElementById('user-status-text');
+        const offlineBanner = document.getElementById('offline-banner');
+        
+        function updateUserStatus(status) {
+            if (!statusDot || !statusText) return;
+            if (status === 'offline') {
+                statusDot.className = "w-2 h-2 rounded-full bg-slate-400";
+                statusText.textContent = "Offline";
+                if(offlineBanner) offlineBanner.classList.remove('hidden');
+            } else if (status === 'syncing') {
+                statusDot.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+                statusText.textContent = "Syncing...";
+                if(offlineBanner) offlineBanner.classList.add('hidden');
+            } else if (status === 'synced') {
+                statusDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                statusText.textContent = "Synced";
+                if(offlineBanner) offlineBanner.classList.add('hidden');
+            }
+        }
+
+        // --- State Management ---
+        const localData = JSON.parse(localStorage.getItem('caffine_ramindance_data') || '{}');
+        // Offset for local date
+        const offset = new Date().getTimezoneOffset() * 60000;
+        const todayStr = (new Date(Date.now() - offset)).toISOString().split('T')[0];
+
+        window.state = {
+            user: null,
+            history: localData.history || {}, 
+            screenTime: localData.screenTime || {},
+            journals: localData.journals || {},
+            workoutTime: localData.workoutTime || {},
+            waterGlasses: localData.waterGlasses || {},
+            duration: 45,
+            darkMode: localData.darkMode !== undefined ? localData.darkMode : true,
+            startDateStr: localData.startDateStr || null,
+            lastCelebrated: localData.lastCelebrated || 0,
+            themePalette: localData.themePalette || 'amber'
+        };
+
+        // Show start date modal if no start date set
+        if (!window.state.startDateStr) {
+            setTimeout(() => {
+                showStartChallengeSection();
+                // Set default date to today
+                const today = new Date();
+                const offset = today.getTimezoneOffset() * 60000;
+                const todayStr = (new Date(today.getTime() - offset)).toISOString().split('T')[0];
+                document.getElementById('start-date-input-inline').value = todayStr;
+            }, 1200);
+        }
+
+        let popupState = { isOpen: false, date: null, hours: 0, isLocked: true };
+
+        // --- Repair Logic (New Feature) ---
+        window.repairTimeline = function() {
+            const dates = Object.keys(window.state.history).sort();
+            if (dates.length === 0) {
+                 alert("No history found to sync from.");
+                 return;
+            }
+
+            const earliestHistory = dates[0];
+            const currentStart = window.state.startDateStr;
+            let updated = false;
+
+            // If the earliest data point is BEFORE the current start date, move start date back.
+            if (earliestHistory < currentStart) {
+                console.log(`Repairing timeline: Moving start from ${currentStart} to ${earliestHistory}`);
+                window.state.startDateStr = earliestHistory;
+                updated = true;
+            }
+
+            if (updated) {
+                window.saveData();
+                renderAll();
+                alert(`Timeline synced! Start date restored to ${earliestHistory}.`);
+            } else {
+                alert("Timeline is already in sync with your history.");
+            }
+        };
+
+        // --- Core Sync Logic ---
+        window.saveData = async () => {
+            // 1. Always save to LocalStorage (Immediate UI update)
+            localStorage.setItem('caffine_ramindance_data', JSON.stringify({
+                history: window.state.history,
+                screenTime: window.state.screenTime,
+                journals: window.state.journals,
+                workoutTime: window.state.workoutTime,
+                waterGlasses: window.state.waterGlasses,
+                duration: window.state.duration,
+                darkMode: window.state.darkMode,
+                startDateStr: window.state.startDateStr,
+                lastCelebrated: window.state.lastCelebrated,
+                themePalette: window.state.themePalette
+            }));
+            
+            // 2. Try Cloud Sync if possible
+            if (firebaseLoaded && navigator.onLine && window.state.user) {
+                // CRITICAL FIX: Do NOT overwrite cloud data if we haven't finished the initial sync
+                // This prevents a new device (initialized with Today) from overwriting an existing account's start date
+                if (!initialCloudSyncComplete) {
+                    console.log("Skipping cloud save: Initial sync not complete");
+                    return;
+                }
+
+                updateUserStatus('syncing');
+                try {
+                    await setDoc(doc(db, 'caffine-ramindance', window.state.user.uid), {
+                        history: window.state.history,
+                        screenTime: window.state.screenTime,
+                        journals: window.state.journals,
+                        workoutTime: window.state.workoutTime,
+                        waterGlasses: window.state.waterGlasses,
+                        duration: window.state.duration,
+                        darkMode: window.state.darkMode,
+                        startDateStr: window.state.startDateStr,
+                        lastCelebrated: window.state.lastCelebrated,
+                        themePalette: window.state.themePalette,
+                        lastUpdated: new Date().toISOString()
+                    }, { merge: true });
+                    
+                    updateUserStatus('synced');
+                    localStorage.removeItem('caffine_ramindance_needs_sync');
+                } catch (e) {
+                    console.error("Cloud save failed:", e);
+                    markAsDirty();
+                }
+            } else {
+                markAsDirty();
+            }
+            renderAll(); // Re-render to update UI
+        };
+
+        function markAsDirty() {
+            updateUserStatus('offline');
+            localStorage.setItem('caffine_ramindance_needs_sync', 'true');
+        }
+
+        function setupAuthListener() {
+            onAuthStateChanged(auth, async (user) => {
+                window.state.user = user;
+                const authForm = document.getElementById('auth-form');
+                const loggedInActions = document.getElementById('logged-in-actions');
+                const userEmail = document.getElementById('user-email');
+
+                if (user) {
+                    userEmail.textContent = user.isAnonymous ? "Guest (Synced)" : user.email;
+                    authForm.classList.add('hidden');
+                    loggedInActions.classList.remove('hidden');
+
+                    // Cloud Sync Strategy
+                    if (navigator.onLine) {
+                        updateUserStatus('syncing');
+                        const docRef = doc(db, 'caffine-ramindance', user.uid);
+                        
+                        try {
+                            // Initial Fetch
+                            const snap = await getDoc(docRef);
+                            if (snap.exists()) {
+                                const cloudData = snap.data();
+                                // Merge cloud data into local
+                                window.state.history = { ...window.state.history, ...cloudData.history };
+                                window.state.screenTime = { ...window.state.screenTime, ...(cloudData.screenTime || {}) };
+                                window.state.journals = { ...window.state.journals, ...(cloudData.journals || {}) };
+                                window.state.workoutTime = { ...window.state.workoutTime, ...(cloudData.workoutTime || {}) };
+                                window.state.waterGlasses = { ...window.state.waterGlasses, ...(cloudData.waterGlasses || {}) };
+                                window.state.lastCelebrated = cloudData.lastCelebrated || 0;
+                                
+                                // FORCE SYNC START DATE
+                                if (cloudData.startDateStr) {
+                                    window.state.startDateStr = cloudData.startDateStr;
+                                } 
+                                
+                                // AUTOMATIC REPAIR on LOGIN
+                                // Check if history has dates older than the start date and fix immediately
+                                const historyDates = Object.keys(window.state.history).sort();
+                                if (historyDates.length > 0 && historyDates[0] < window.state.startDateStr) {
+                                    console.log(`Auto-repairing start date from ${window.state.startDateStr} to ${historyDates[0]}`);
+                                    window.state.startDateStr = historyDates[0];
+                                }
+                                
+                                if (cloudData.duration) window.state.duration = cloudData.duration;
+                                if (cloudData.darkMode !== undefined) window.state.darkMode = cloudData.darkMode;
+                                
+                                // Mark sync as complete BEFORE saving
+                                initialCloudSyncComplete = true;
+                                window.saveData(); 
+                            } else {
+                                // New User in Cloud
+                                initialCloudSyncComplete = true;
+                                window.saveData(); // Push local to cloud
+                            }
+
+                            // Listener
+                            onSnapshot(docRef, (snapshot) => {
+                                if (!snapshot.exists()) return;
+                                const cloudData = snapshot.data();
+                                const needsSync = localStorage.getItem('caffine_ramindance_needs_sync') === 'true';
+                                // Only overwrite local if we aren't dirty (pending save)
+                                if (!needsSync) {
+                                    window.state.history = { ...window.state.history, ...cloudData.history };
+                                    window.state.screenTime = { ...window.state.screenTime, ...(cloudData.screenTime || {}) };
+                                    window.state.journals = { ...window.state.journals, ...(cloudData.journals || {}) };
+                                    window.state.workoutTime = { ...window.state.workoutTime, ...(cloudData.workoutTime || {}) };
+                                    window.state.waterGlasses = { ...window.state.waterGlasses, ...(cloudData.waterGlasses || {}) };
+                                    window.state.lastCelebrated = cloudData.lastCelebrated || 0;
+                                    
+                                    // Live update start date
+                                    if (cloudData.startDateStr) {
+                                        window.state.startDateStr = cloudData.startDateStr;
+                                    }
+                                    if (cloudData.duration) window.state.duration = cloudData.duration;
+                                    
+                                    renderAll();
+                                }
+                            });
+                        } catch(e) {
+                            console.log("Error fetching cloud data", e);
+                            updateUserStatus('offline');
+                            // If fetch failed, we allow local edits to proceed but stay in 'offline' state
+                            initialCloudSyncComplete = true; 
+                        }
+                    } else {
+                        initialCloudSyncComplete = true; 
+                    }
+
+                    // Setup tracker sync
+                    setupTrackerSync(user.uid);
+
+                } else {
+                    userEmail.textContent = "Guest / Offline";
+                    authForm.classList.remove('hidden');
+                    loggedInActions.classList.add('hidden');
+                    updateUserStatus('offline');
+                    initialCloudSyncComplete = false;
+                    
+                    updateTrackerStatus('offline');
+                    // Clean up tracker listener
+                    if (trackerSyncListener) {
+                        trackerSyncListener();
+                        trackerSyncListener = null;
+                    }
+                }
+                renderAll();
+            });
+        }
+
+        // --- Network Listeners ---
+        window.addEventListener('online', () => {
+            console.log("Network restored");
+            if(firebaseLoaded && window.state.user) {
+                // Sync main data
+                const needsSync = localStorage.getItem('caffine_ramindance_needs_sync') === 'true';
+                if (needsSync) {
+                    console.log("Syncing pending changes...");
+                    window.saveData();
+                } else {
+                    updateUserStatus('synced');
+                }
+                
+                // Sync tracker data
+                const trackerNeedsSync = localStorage.getItem('tracker_needs_sync') === 'true';
+                if (trackerNeedsSync) {
+                    console.log("Syncing pending tracker changes...");
+                    syncTrackerToFirebase();
+                } else if (!trackerSyncListener) {
+                    // Re-establish tracker sync if not already active
+                    setupTrackerSync(window.state.user.uid);
+                }
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            updateUserStatus('offline');
+            updateTrackerStatus('offline');
+        });
+
+        // Theme Mode Switcher
+        window.setThemeMode = function(isDark) {
+            window.state.darkMode = isDark;
+            window.saveData();
+            updateThemeButtons();
+        };
+
+        function updateThemeButtons() {
+            const isDark = window.state.darkMode;
+            // Guest buttons
+            const lightGuest = document.getElementById('theme-light-guest');
+            const darkGuest = document.getElementById('theme-dark-guest');
+            if (lightGuest && darkGuest) {
+                if (isDark) {
+                    lightGuest.className = 'flex-1 p-3 rounded-lg border-2 border-transparent bg-slate-100 dark:bg-slate-800 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                    darkGuest.className = 'flex-1 p-3 rounded-lg border-2 border-slate-500 bg-white dark:bg-slate-700 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                } else {
+                    lightGuest.className = 'flex-1 p-3 rounded-lg border-2 border-amber-500 bg-white dark:bg-slate-800 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                    darkGuest.className = 'flex-1 p-3 rounded-lg border-2 border-transparent bg-slate-100 dark:bg-slate-800 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                }
+            }
+            // Logged in buttons
+            const lightLogged = document.getElementById('theme-light-logged');
+            const darkLogged = document.getElementById('theme-dark-logged');
+            if (lightLogged && darkLogged) {
+                if (isDark) {
+                    lightLogged.className = 'flex-1 p-3 rounded-lg border-2 border-transparent bg-slate-100 dark:bg-slate-800 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                    darkLogged.className = 'flex-1 p-3 rounded-lg border-2 border-slate-500 bg-white dark:bg-slate-700 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                } else {
+                    lightLogged.className = 'flex-1 p-3 rounded-lg border-2 border-amber-500 bg-white dark:bg-slate-800 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                    darkLogged.className = 'flex-1 p-3 rounded-lg border-2 border-transparent bg-slate-100 dark:bg-slate-800 hover:scale-105 transition-transform flex items-center justify-center gap-2';
+                }
+            }
+        }
+
+        // Theme Palette Switcher
+        window.setThemePalette = function(palette) {
+            window.state.themePalette = palette;
+            applyThemePalette(palette);
+            window.saveData();
+        };
+
+        function applyThemePalette(palette) {
+            const root = document.documentElement;
+            const palettes = {
+                amber: { 
+                    light: { primary: '#f59e0b', accent: '#fbbf24', bg: '#fffbeb', bgCard: '#fef3c7', border: '#fde68a', text: '#92400e' },
+                    dark: { primary: '#fbbf24', accent: '#fcd34d', bg: '#000000', bgCard: '#1a1a00', border: '#eab308', text: '#fef3c7' }
+                },
+                blue: { 
+                    light: { primary: '#3b82f6', accent: '#60a5fa', bg: '#eff6ff', bgCard: '#dbeafe', border: '#93c5fd', text: '#1e3a8a' },
+                    dark: { primary: '#60a5fa', accent: '#93c5fd', bg: '#0f172a', bgCard: '#1e293b', border: '#3b82f6', text: '#dbeafe' }
+                },
+                purple: { 
+                    light: { primary: '#a855f7', accent: '#c084fc', bg: '#faf5ff', bgCard: '#f3e8ff', border: '#d8b4fe', text: '#6b21a8' },
+                    dark: { primary: '#c084fc', accent: '#e9d5ff', bg: '#1e1b4b', bgCard: '#312e81', border: '#a855f7', text: '#f3e8ff' }
+                },
+                green: { 
+                    light: { primary: '#10b981', accent: '#34d399', bg: '#f0fdf4', bgCard: '#d1fae5', border: '#6ee7b7', text: '#065f46' },
+                    dark: { primary: '#34d399', accent: '#6ee7b7', bg: '#022c22', bgCard: '#064e3b', border: '#10b981', text: '#d1fae5' }
+                },
+                rose: { 
+                    light: { primary: '#f43f5e', accent: '#fb7185', bg: '#fff1f2', bgCard: '#ffe4e6', border: '#fda4af', text: '#9f1239' },
+                    dark: { primary: '#fb7185', accent: '#fda4af', bg: '#1f1315', bgCard: '#4c1d24', border: '#f43f5e', text: '#ffe4e6' }
+                },
+                slate: { 
+                    light: { primary: '#64748b', accent: '#94a3b8', bg: '#f8fafc', bgCard: '#e2e8f0', border: '#cbd5e1', text: '#1e293b' },
+                    dark: { primary: '#94a3b8', accent: '#cbd5e1', bg: '#0f172a', bgCard: '#1e293b', border: '#64748b', text: '#e2e8f0' }
+                }
+            };
+            
+            const paletteColors = palettes[palette] || palettes.amber;
+            const isDark = window.state.darkMode;
+            const colors = isDark ? paletteColors.dark : paletteColors.light;
+            
+            // Update body background
+            document.body.style.backgroundColor = colors.bg;
+            
+            // Apply comprehensive theme overrides
+            const style = document.createElement('style');
+            style.id = 'theme-override';
+            const existing = document.getElementById('theme-override');
+            if (existing) existing.remove();
+            
+            style.textContent = `
+                /* Text Colors */
+                .text-amber-200 { color: ${colors.text} !important; }
+                .text-amber-300 { color: ${colors.accent} !important; }
+                .text-amber-400 { color: ${colors.accent} !important; }
+                .text-amber-500 { color: ${colors.primary} !important; }
+                .text-amber-600 { color: ${colors.primary} !important; }
+                .text-amber-800 { color: ${colors.text} !important; }
+                .dark .text-amber-200 { color: ${colors.text} !important; }
+                .dark .text-amber-300 { color: ${colors.accent} !important; }
+                .dark .text-amber-400 { color: ${colors.accent} !important; }
+                .dark .text-amber-500 { color: ${colors.primary} !important; }
+                .dark .text-amber-600 { color: ${colors.primary} !important; }
+                .dark .text-amber-800 { color: ${colors.border} !important; }
+                
+                /* Background Colors */
+                .bg-amber-50 { background-color: ${colors.bg} !important; }
+                .bg-amber-100 { background-color: ${colors.bgCard} !important; }
+                .bg-amber-400 { background-color: ${colors.accent} !important; }
+                .bg-amber-500 { background-color: ${colors.primary} !important; }
+                .bg-amber-900 { background-color: ${colors.bgCard} !important; }
+                .bg-amber-950\/20 { background-color: ${colors.bgCard}33 !important; }
+                .dark .bg-amber-50 { background-color: ${colors.bg} !important; }
+                .dark .bg-amber-100 { background-color: ${colors.bgCard} !important; }
+                .dark .bg-amber-400 { background-color: ${colors.accent} !important; }
+                .dark .bg-amber-500 { background-color: ${colors.primary} !important; }
+                .dark .bg-amber-900 { background-color: ${colors.bgCard} !important; }
+                .dark .bg-amber-950\/20 { background-color: ${colors.bgCard}33 !important; }
+                .dark .bg-amber-900\/10 { background-color: ${colors.bgCard}1a !important; }
+                .dark .bg-amber-900\/30 { background-color: ${colors.bgCard}4d !important; }
+                .dark .bg-amber-900\/40 { background-color: ${colors.bgCard}66 !important; }
+                .dark .bg-amber-900\/50 { background-color: ${colors.bgCard}80 !important; }
+                
+                /* Border Colors */
+                .border-amber-100 { border-color: ${colors.border} !important; }
+                .border-amber-200 { border-color: ${colors.border} !important; }
+                .border-amber-300 { border-color: ${colors.accent} !important; }
+                .border-amber-400 { border-color: ${colors.primary} !important; }
+                .border-amber-500 { border-color: ${colors.primary} !important; }
+                .border-amber-600 { border-color: ${colors.primary} !important; }
+                .border-amber-700 { border-color: ${colors.border} !important; }
+                .border-amber-800 { border-color: ${colors.border} !important; }
+                .dark .border-amber-100 { border-color: ${colors.border} !important; }
+                .dark .border-amber-200 { border-color: ${colors.border} !important; }
+                .dark .border-amber-300 { border-color: ${colors.accent} !important; }
+                .dark .border-amber-400 { border-color: ${colors.primary} !important; }
+                .dark .border-amber-500 { border-color: ${colors.primary} !important; }
+                .dark .border-amber-600 { border-color: ${colors.primary} !important; }
+                .dark .border-amber-700 { border-color: ${colors.border} !important; }
+                .dark .border-amber-800 { border-color: ${colors.border} !important; }
+                .dark .border-amber-800\/50 { border-color: ${colors.border}80 !important; }
+                .dark .border-amber-900\/20 { border-color: ${colors.border}33 !important; }
+                
+                /* Hover States */
+                .hover\\:bg-amber-100:hover { background-color: ${colors.bgCard} !important; }
+                .hover\\:bg-amber-600:hover { background-color: ${colors.primary} !important; }
+                .hover\\:bg-amber-900:hover { background-color: ${colors.bgCard} !important; }
+                .dark .hover\\:bg-amber-100:hover { background-color: ${colors.bgCard} !important; }
+                .dark .hover\\:bg-amber-600:hover { background-color: ${colors.primary} !important; }
+                .dark .hover\\:bg-amber-800:hover { background-color: ${colors.border} !important; }
+                .dark .hover\\:bg-amber-900:hover { background-color: ${colors.bgCard} !important; }
+                .dark .hover\\:bg-amber-900\/30:hover { background-color: ${colors.bgCard}4d !important; }
+                .dark .hover\\:bg-amber-900\/50:hover { background-color: ${colors.bgCard}80 !important; }
+                .hover\\:text-amber-200:hover { color: ${colors.text} !important; }
+                .hover\\:text-amber-400:hover { color: ${colors.accent} !important; }
+                .hover\\:text-amber-600:hover { color: ${colors.primary} !important; }
+                .dark .hover\\:text-amber-200:hover { color: ${colors.text} !important; }
+                .dark .hover\\:text-amber-400:hover { color: ${colors.accent} !important; }
+                .dark .hover\\:text-amber-600:hover { color: ${colors.primary} !important; }
+                
+                /* Ring Colors */
+                .ring-amber-300 { --tw-ring-color: ${colors.accent} !important; }
+                .ring-amber-400 { --tw-ring-color: ${colors.primary} !important; }
+                .ring-amber-500 { --tw-ring-color: ${colors.primary} !important; }
+                .dark .ring-amber-300 { --tw-ring-color: ${colors.accent} !important; }
+                .dark .ring-amber-400 { --tw-ring-color: ${colors.primary} !important; }
+                .dark .ring-amber-500 { --tw-ring-color: ${colors.primary} !important; }
+                
+                /* Focus Ring */
+                .focus\\:ring-amber-400:focus { --tw-ring-color: ${colors.primary} !important; }
+                .focus\\:ring-amber-500:focus { --tw-ring-color: ${colors.primary} !important; }
+                
+                /* Shadow Colors */
+                .shadow-amber-200\/50 { --tw-shadow-color: ${colors.border}80; --tw-shadow: var(--tw-shadow-colored); }
+                .shadow-amber-500\/20 { --tw-shadow-color: ${colors.primary}33; --tw-shadow: var(--tw-shadow-colored); }
+                .shadow-amber-500\/30 { --tw-shadow-color: ${colors.primary}4d; --tw-shadow: var(--tw-shadow-colored); }
+                
+                /* SVG Stroke Colors */
+                svg.text-amber-400, svg.text-amber-500, svg.text-amber-600 { stroke: ${colors.primary} !important; }
+                .dark svg.text-amber-400, .dark svg.text-amber-500, .dark svg.text-amber-600 { stroke: ${colors.accent} !important; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // --- Render Logic ---
+        function renderAll() {
+            applyTheme();
+            renderHeader();
+            renderStats();
+            renderGrid();
+            if (popupState.isOpen) updatePopupContent();
+            
+            // Safe Icon Rendering
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        function applyTheme() {
+            const html = document.documentElement;
+            const body = document.body;
+            
+            if (window.state.darkMode) {
+                html.classList.add('dark');
+                body.classList.add('dark');
+                body.style.backgroundColor = '#000000';
+            } else {
+                html.classList.remove('dark');
+                body.classList.remove('dark');
+                body.style.backgroundColor = '#fffbeb';
+            }
+            // Apply color palette
+            applyThemePalette(window.state.themePalette);
+        }
+
+        function renderHeader() {
+            // Update current date display
+            const today = new Date();
+            const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            document.getElementById('current-date-display').textContent = `${dayName} ${day}/${month}`;
+            
+            const dateEl = document.getElementById('start-date-display');
+            if (window.state.startDateStr) {
+                const [y, m, d] = window.state.startDateStr.split('-').map(Number);
+                const startDate = new Date(y, m-1, d);
+                const today = new Date();
+                const daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                const daysLeft = Math.max(0, window.state.duration - daysPassed);
+                let phase = '';
+                if (window.state.duration === 45) {
+                    phase = daysPassed <= 9 ? 'Comfgoria' : 'Brutodis';
+                } else if (window.state.duration === 90) {
+                    phase = daysPassed <= 18 ? 'Comfgoria' : 'Brutodis';
+                } else if (window.state.duration === 180) {
+                    phase = daysPassed <= 36 ? 'Comfgoria' : 'Brutodis';
+                }
+                dateEl.innerHTML = `<span class="text-slate-900 dark:text-white font-bold">Day ${Math.min(daysPassed, window.state.duration)}/${window.state.duration}</span> <span class="text-slate-400 dark:text-slate-600">•</span> <span class="text-amber-600 dark:text-amber-400 font-bold">${phase}</span> <span class="text-slate-400 dark:text-slate-600">•</span> <span class="text-slate-600 dark:text-slate-400">${daysLeft} days left</span>`;
+            } else {
+                dateEl.innerHTML = '<span class="text-slate-500 dark:text-slate-400">Set your start date to begin</span>';
+            }
+
+            const container = document.getElementById('duration-container');
+            container.innerHTML = '';
+            [45, 90, 180].forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = `flex-1 md:flex-none px-4 py-2 text-xs md:text-sm font-bold rounded-lg whitespace-nowrap transition-all ${
+                    window.state.duration === d 
+                    ? 'bg-white dark:bg-amber-800 shadow-sm text-amber-600 dark:text-white' 
+                    : 'text-slate-500 dark:text-amber-400 hover:text-slate-700 dark:hover:text-amber-200'
+                }`;
+                btn.textContent = `🔥 ${d} Days`;
+                btn.onclick = () => {
+                    window.state.duration = d;
+                    window.saveData();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function calculateStreaks() {
+            const offset = new Date().getTimezoneOffset() * 60000;
+            const todayStr = (new Date(Date.now() - offset)).toISOString().split('T')[0];
+            let checkDate = new Date();
+            
+            // If today is 0, check yesterday to allow streak to hold
+            if ((window.state.history[todayStr] || 0) === 0) {
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+            
+            // Check for celebration
+            const anyStreak = (() => {
+                let count = 0;
+                let d = new Date(checkDate);
+                for (let i=0; i<365; i++) {
+                    const offset = d.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(d - offset)).toISOString().slice(0, -1);
+                    const localDS = localISOTime.split('T')[0];
+                    if ((window.state.history[localDS] || 0) >= 1) {
+                        count++;
+                        d.setDate(d.getDate() - 1);
+                    } else {
+                        break;
+                    }
+                }
+                return count;
+            })();
+            
+            // Celebrate every 10 days
+            if (anyStreak >= 10 && anyStreak % 10 === 0 && anyStreak > window.state.lastCelebrated) {
+                window.state.lastCelebrated = anyStreak;
+                window.saveData();
+                showCelebration(anyStreak);
+            }
+            
+            const runCheck = (threshold) => {
+                let count = 0;
+                let d = new Date(checkDate);
+                for (let i=0; i<365; i++) {
+                    const offset = d.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(d - offset)).toISOString().slice(0, -1);
+                    const localDS = localISOTime.split('T')[0];
+
+                    if ((window.state.history[localDS] || 0) >= threshold) {
+                        count++;
+                        d.setDate(d.getDate() - 1);
+                    } else {
+                        break;
+                    }
+                }
+                return count;
+            };
+            return { any: runCheck(1), medium: runCheck(5), deep: runCheck(8) };
+        }
+
+        let streakInterval, streakIndex = 0;
+        function renderStats() {
+            const totalHours = Object.values(window.state.history).reduce((a,b) => a+b, 0);
+            const daysLogged = Object.values(window.state.history).filter(h => h > 0).length;
+            
+            document.getElementById('stat-total-hours').textContent = `${totalHours}h`;
+            document.getElementById('stat-days-logged').textContent = daysLogged;
+
+            if (!streakInterval) {
+                renderStreakCard();
+                streakInterval = setInterval(() => {
+                    streakIndex = (streakIndex + 1) % 3;
+                    renderStreakCard();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }, 3000);
+            } else {
+                renderStreakCard();
+            }
+        }
+
+        function renderStreakCard() {
+            const streaks = calculateStreaks();
+            const types = [
+                { label: "Activity Streak", value: streaks.any, icon: "flame", color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/20" },
+                { label: "Deep Work Streak", value: streaks.medium, icon: "zap", color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/20" },
+                { label: "Mastery Streak", value: streaks.deep, icon: "trophy", color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/20" }
+            ];
+            const current = types[streakIndex];
+            const card = document.getElementById('streak-card');
+            card.className = `col-span-2 md:col-span-1 flex flex-col p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 transition-all duration-500 relative overflow-hidden ${current.bg}`;
+            card.innerHTML = `
+                <div class="mb-2 ${current.color} flex items-center justify-between">
+                    <i data-lucide="${current.icon}" width="18" height="18"></i>
+                    <div class="w-8 h-1 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full bg-current opacity-50 animate-progress"></div>
+                    </div>
+                </div>
+                <div class="animate-fadeIn">
+                    <span class="text-3xl font-bold text-slate-800 dark:text-white block tracking-tight">
+                        ${current.value} <span class="text-sm font-medium text-slate-500 dark:text-zinc-500">days</span>
+                    </span>
+                    <span class="text-[10px] md:text-xs text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wider opacity-80">${current.label}</span>
+                </div>
+            `;
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('grid-container');
+            grid.innerHTML = '';
+            const displayDuration = window.state.duration;
+            const colSize = displayDuration >= 180 ? '22px' : '38px';
+            grid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${colSize}, 1fr))`;
+
+            if (!window.state.startDateStr) {
+                showStartChallengeSection();
+                return;
+            }
+            hideStartChallengeSection();
+            const [y, m, d] = window.state.startDateStr.split('-').map(Number);
+            const start = new Date(y, m-1, d);
+            const today = new Date();
+            // Local ISO helper
+            const getLocalDS = (date) => {
+                 const offset = date.getTimezoneOffset() * 60000;
+                 return (new Date(date.getTime() - offset)).toISOString().split('T')[0];
+            };
+            const offset = today.getTimezoneOffset() * 60000;
+            const todayIso = (new Date(today.getTime() - offset)).toISOString().split('T')[0];
+
+            for(let i=0; i<displayDuration; i++) {
+                const date = new Date(start);
+                date.setDate(start.getDate() + i);
+                const iso = getLocalDS(date);
+                const hours = window.state.history[iso] || 0;
+                
+                const isToday = iso === todayIso;
+                const isFuture = date > today && !isToday;
+
+                let colorClass = "bg-amber-100 dark:bg-amber-900 border-amber-200 dark:border-amber-700 text-transparent";
+                if (hours > 0) {
+                     if (hours <= 2) colorClass = "bg-yellow-300 dark:bg-yellow-600 border-yellow-400 dark:border-yellow-800 text-yellow-900 dark:text-yellow-100";
+                     else if (hours <= 4) colorClass = "bg-purple-400 dark:bg-purple-600 border-purple-500 dark:border-purple-800 text-white";
+                     else if (hours <= 6) colorClass = "bg-cyan-400 dark:bg-cyan-600 border-cyan-500 dark:border-cyan-800 text-cyan-900 dark:text-cyan-100";
+                     else if (hours <= 8) colorClass = "bg-green-500 dark:bg-green-600 border-green-600 dark:border-green-800 text-white";
+                     else if (hours <= 10) colorClass = "bg-blue-500 dark:bg-blue-600 border-blue-600 dark:border-blue-800 text-white";
+                     else if (hours <= 12) colorClass = "bg-indigo-600 dark:bg-indigo-700 border-indigo-700 dark:border-indigo-900 text-white";
+                     else colorClass = "bg-gradient-to-r from-pink-500 to-violet-600 dark:from-pink-600 dark:to-violet-700 border-pink-600 dark:border-pink-800 text-white";
+                }
+
+                const btn = document.createElement('button');
+                btn.className = `group relative w-full aspect-square rounded-md md:rounded-lg border-b-[2px] md:border-b-[3px] ease-out touch-manipulation flex items-center justify-center font-bold text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 dark:focus:ring-offset-black ${hours === 0 ? 'translate-y-0' : '-translate-y-[1px] md:-translate-y-[2px]'} ${colorClass} ${isToday ? 'ring-2 ring-offset-2 ring-amber-300 dark:ring-amber-400 animate-pulse-slow z-10' : ''} ${isFuture ? 'opacity-30 cursor-not-allowed' : ''} active:border-b-0 active:translate-y-[1px] md:active:translate-y-[2px] ${hours > 0 ? 'shadow-md dark:shadow-lg' : 'shadow-sm'}`;
+
+                if (!isToday && hours === 0) {
+                    btn.innerHTML = `<i data-lucide="lock" width="8" height="8" class="text-amber-300 dark:text-amber-600 absolute"></i>`;
+                } else if (hours > 0) {
+                    btn.textContent = hours;
+                }
+
+                if (!isFuture) {
+                    const handleInteraction = () => {
+                        if (isToday) {
+                             let next = hours === 0 ? 2 : (hours < 14 ? hours + 1 : 0);
+                             window.state.history[iso] = next;
+                             window.saveData();
+                        } else {
+                            openPopup(date, hours);
+                        }
+                    };
+
+                    let longPressTimer;
+                    const startPress = () => { longPressTimer = setTimeout(() => { openPopup(date, hours); longPressTimer = null; }, 600); };
+                    const cancelPress = () => { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } };
+
+                    btn.addEventListener('mousedown', startPress);
+                    btn.addEventListener('touchstart', startPress, {passive: true});
+                    btn.addEventListener('mouseup', () => { if(longPressTimer) { clearTimeout(longPressTimer); handleInteraction(); } });
+                    btn.addEventListener('touchend', (e) => { 
+                        if(longPressTimer) { 
+                            clearTimeout(longPressTimer); 
+                            e.preventDefault(); 
+                            handleInteraction(); 
+                        } 
+                    });
+                    btn.addEventListener('mouseleave', cancelPress);
+                    btn.addEventListener('touchmove', cancelPress);
+                } else {
+                     btn.onclick = () => openPopup(date, hours);
+                }
+                grid.appendChild(btn);
+            }
+        }
+
+        // --- Popup Logic ---
+        function openPopup(date, hours) {
+            const offset = new Date().getTimezoneOffset() * 60000;
+            const todayIso = (new Date(Date.now() - offset)).toISOString().split('T')[0];
+            const dateIso = (new Date(date.getTime() - offset)).toISOString().split('T')[0];
+
+            popupState = {
+                isOpen: true,
+                date: date,
+                hours: hours,
+                isLocked: dateIso !== todayIso,
+                screenTime: window.state.screenTime[dateIso] || 0,
+                workoutTime: window.state.workoutTime[dateIso] || 0,
+                waterGlasses: window.state.waterGlasses[dateIso] || 0,
+                journal: window.state.journals[dateIso] || ''
+            };
+            updatePopupContent();
+            document.getElementById('popup-backdrop').classList.remove('hidden');
+        }
+
+        function updatePopupContent() {
+            const { date, hours, isLocked, screenTime, workoutTime, waterGlasses, journal } = popupState;
+             const offset = new Date().getTimezoneOffset() * 60000;
+             const todayIso = (new Date(Date.now() - offset)).toISOString().split('T')[0];
+             const dateIso = (new Date(date.getTime() - offset)).toISOString().split('T')[0];
+             const isToday = dateIso === todayIso;
+             const isFuture = date > new Date() && !isToday;
+
+            document.getElementById('popup-date').textContent = new Intl.DateTimeFormat('en-US', {weekday:'short', month:'short', day:'numeric'}).format(date);
+            document.getElementById('popup-status').textContent = isToday ? "Today" : isFuture ? "Future" : "History";
+            
+            const hoursVal = document.getElementById('popup-hours-val');
+            hoursVal.textContent = hours;
+            const progress = document.getElementById('popup-progress-bar');
+            progress.style.width = `${Math.min((hours / 14) * 100, 100)}%`;
+
+            // Study hours slider
+            document.getElementById('popup-study-hours').value = hours;
+            document.getElementById('study-hours-display').textContent = `${hours}h`;
+            document.getElementById('popup-study-hours').disabled = isFuture;
+
+            // Screen time, workout, water, and journal (always visible)
+            document.getElementById('popup-screen-time').value = screenTime || 0;
+            document.getElementById('screen-time-display').textContent = `${screenTime || 0} min`;
+            document.getElementById('popup-workout-time').value = workoutTime || 0;
+            document.getElementById('workout-time-display').textContent = `${workoutTime || 0} min`;
+            document.getElementById('popup-water-glasses').value = waterGlasses || 0;
+            document.getElementById('water-glasses-display').textContent = `${waterGlasses || 0} glasses`;
+            document.getElementById('popup-journal').value = journal || '';
+
+            // Controls visibility
+            document.getElementById('btn-unlock').classList.toggle('hidden', isFuture);
+            document.getElementById('msg-future').classList.toggle('hidden', !isFuture);
+            document.getElementById('popup-unlocked-dot').classList.toggle('hidden', isLocked);
+            
+            // Text Desc
+            const textDesc = document.getElementById('popup-text-desc');
+            const box = document.getElementById('popup-hours-box');
+            
+            // Reset box classes to base then add specific
+            box.className = "relative w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold shadow-inner transition-colors duration-300";
+            
+            if (hours === 0) { box.classList.add('bg-amber-100','dark:bg-amber-900','text-amber-400'); textDesc.textContent = "No Activity"; }
+            else if (hours <= 4) { box.classList.add('bg-purple-400','text-white'); textDesc.textContent = "Getting Started"; }
+            else if (hours <= 8) { box.classList.add('bg-green-500','text-white'); textDesc.textContent = "Solid Progress"; }
+            else { box.classList.add('bg-indigo-600','text-white'); textDesc.textContent = "Deep Focus"; }
+        }
+
+        // --- Interaction Handlers ---
+        document.getElementById('popup-close').onclick = () => { popupState.isOpen = false; document.getElementById('popup-backdrop').classList.add('hidden'); };
+        document.getElementById('btn-unlock').onclick = () => { popupState.isLocked = false; updatePopupContent(); };
+        
+        // Study hours slider handler
+        document.getElementById('popup-study-hours').addEventListener('input', (e) => {
+            const newH = parseInt(e.target.value) || 0;
+            popupState.hours = newH;
+            const offset = popupState.date.getTimezoneOffset() * 60000;
+            const iso = (new Date(popupState.date.getTime() - offset)).toISOString().split('T')[0];
+            window.state.history[iso] = newH;
+            document.getElementById('popup-hours-val').textContent = newH;
+            document.getElementById('study-hours-display').textContent = `${newH}h`;
+            document.getElementById('popup-progress-bar').style.width = `${Math.min((newH / 14) * 100, 100)}%`;
+            
+            // Update box styling
+            const box = document.getElementById('popup-hours-box');
+            const textDesc = document.getElementById('popup-text-desc');
+            box.className = "relative w-16 h-16 rounded-2xl flex items-center justify-center text-3xl font-bold shadow-inner transition-colors duration-300";
+            
+            if (newH === 0) { box.classList.add('bg-amber-100','dark:bg-amber-900','text-amber-400'); textDesc.textContent = "No Activity"; }
+            else if (newH <= 4) { box.classList.add('bg-purple-400','text-white'); textDesc.textContent = "Getting Started"; }
+            else if (newH <= 8) { box.classList.add('bg-green-500','text-white'); textDesc.textContent = "Solid Progress"; }
+            else { box.classList.add('bg-indigo-600','text-white'); textDesc.textContent = "Deep Focus"; }
+            
+            window.saveData();
+        });
+
+        // Profile
+        const profileModal = document.getElementById('profile-modal');
+        const openProfile = () => { 
+            profileModal.classList.remove('hidden'); 
+            updateThemeButtons();
+            if (typeof lucide !== 'undefined') lucide.createIcons(); 
+        };
+        document.getElementById('profile-btn').onclick = openProfile;
+        document.getElementById('profile-btn-mobile').onclick = openProfile;
+        document.getElementById('close-profile').onclick = () => {
+            profileModal.classList.add('hidden');
+            // Clear errors on close
+            document.getElementById('auth-error').classList.add('hidden');
+        };
+        
+        // --- Auth Actions ---
+
+        function getAuthData() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorEl = document.getElementById('auth-error');
+            errorEl.classList.add('hidden');
+            
+            if (!email || !password) {
+                errorEl.textContent = "Please enter both email and password";
+                errorEl.classList.remove('hidden');
+                return null;
+            }
+            return { email, password, errorEl };
+        }
+
+        document.getElementById('btn-signin').onclick = async () => {
+            if (!firebaseLoaded) { alert("Offline: Cannot login."); return; }
+            const data = getAuthData();
+            if (!data) return;
+
+            try {
+                await signInWithEmailAndPassword(auth, data.email, data.password);
+                profileModal.classList.add('hidden');
+                // Clear inputs
+                document.getElementById('auth-email').value = '';
+                document.getElementById('auth-password').value = '';
+            } catch(e) {
+                data.errorEl.textContent = "Login Failed: " + e.message.replace('Firebase: ', '');
+                data.errorEl.classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('btn-signup').onclick = async () => {
+             if (!firebaseLoaded) { alert("Offline: Cannot sign up."); return; }
+             const data = getAuthData();
+             if (!data) return;
+
+             try {
+                 await createUserWithEmailAndPassword(auth, data.email, data.password);
+                 profileModal.classList.add('hidden');
+                 // Clear inputs
+                 document.getElementById('auth-email').value = '';
+                 document.getElementById('auth-password').value = '';
+             } catch(e) {
+                 data.errorEl.textContent = "Sign Up Failed: " + e.message.replace('Firebase: ', '');
+                 data.errorEl.classList.remove('hidden');
+             }
+        };
+
+        document.getElementById('btn-sync-timeline').onclick = () => {
+             if(window.repairTimeline) window.repairTimeline();
+        };
+
+        document.getElementById('btn-reset-db').onclick = async () => {
+            if (!confirm('Are you sure? This will permanently delete ALL your entries from this device and cloud. This cannot be undone.')) return;
+            
+            // Clear local state
+            window.state.history = {};
+            window.state.screenTime = {};
+            window.state.journals = {};
+            window.state.workoutTime = {};
+            window.state.waterGlasses = {};
+            window.state.startDateStr = null;
+            window.state.lastCelebrated = 0;
+            
+            // Clear localStorage
+            localStorage.removeItem('caffine_ramindance_data');
+            localStorage.removeItem('caffine_ramindance_needs_sync');
+            
+            // Delete from Firebase if user is logged in
+            if (firebaseLoaded && window.state.user && deleteDoc) {
+                try {
+                    updateUserStatus('syncing');
+                    await deleteDoc(doc(db, 'caffine-ramindance', window.state.user.uid));
+                    console.log('Cloud data deleted successfully');
+                    updateUserStatus('synced');
+                } catch(e) {
+                    console.error('Cloud reset failed:', e);
+                    alert('Local data cleared, but cloud deletion failed. You may need to try again.');
+                }
+            }
+            
+            // Show start date modal
+            showStartChallengeSection();
+            const today = new Date();
+            const offset = today.getTimezoneOffset() * 60000;
+            const todayStr = (new Date(today.getTime() - offset)).toISOString().split('T')[0];
+            document.getElementById('start-date-input-inline').value = todayStr;
+            
+            // Re-render
+            renderAll();
+        };
+
+        document.getElementById('logout-btn').onclick = async () => {
+            if (firebaseLoaded) {
+                await signOut(auth);
+                // Clear inputs
+                document.getElementById('auth-email').value = '';
+                document.getElementById('auth-password').value = '';
+            }
+        };
+
+        // Tracker sync stubs (tracker.html handles its own sync)
+        let trackerSyncListener = null;
+        function setupTrackerSync(uid) {}
+        function updateTrackerStatus(status) {}
+        function syncTrackerToFirebase() {}
+
+        // Start Date Modal Handler
+        document.getElementById('confirm-start-date-inline').onclick = () => {
+            const dateInput = document.getElementById('start-date-input-inline');
+            if (dateInput.value) {
+                window.state.startDateStr = dateInput.value;
+                window.saveData();
+                hideStartChallengeSection();
+            } else {
+                alert('Please select a start date');
+            }
+        };
+
+        // Screen time, workout, water, and journal handlers
+        document.getElementById('popup-screen-time').addEventListener('input', (e) => {
+            const offset = popupState.date.getTimezoneOffset() * 60000;
+            const dateIso = (new Date(popupState.date.getTime() - offset)).toISOString().split('T')[0];
+            const value = parseInt(e.target.value) || 0;
+            window.state.screenTime[dateIso] = value;
+            popupState.screenTime = value;
+            document.getElementById('screen-time-display').textContent = `${value} min`;
+            window.saveData();
+        });
+
+        document.getElementById('popup-workout-time').addEventListener('input', (e) => {
+            const offset = popupState.date.getTimezoneOffset() * 60000;
+            const dateIso = (new Date(popupState.date.getTime() - offset)).toISOString().split('T')[0];
+            const value = parseInt(e.target.value) || 0;
+            window.state.workoutTime[dateIso] = value;
+            popupState.workoutTime = value;
+            document.getElementById('workout-time-display').textContent = `${value} min`;
+            window.saveData();
+        });
+
+        document.getElementById('popup-water-glasses').addEventListener('input', (e) => {
+            const offset = popupState.date.getTimezoneOffset() * 60000;
+            const dateIso = (new Date(popupState.date.getTime() - offset)).toISOString().split('T')[0];
+            const value = parseInt(e.target.value) || 0;
+            window.state.waterGlasses[dateIso] = value;
+            popupState.waterGlasses = value;
+            document.getElementById('water-glasses-display').textContent = `${value} glasses`;
+            window.saveData();
+        });
+
+        document.getElementById('popup-journal').addEventListener('input', (e) => {
+            const offset = popupState.date.getTimezoneOffset() * 60000;
+            const dateIso = (new Date(popupState.date.getTime() - offset)).toISOString().split('T')[0];
+            window.state.journals[dateIso] = e.target.value;
+            popupState.journal = e.target.value;
+            window.saveData();
+        });
+
+        // Start App
+        initApp();
+
+    </script>
+    <script src="https://js.puter.com/v2/"></script>
+
+    <!-- Floating Bee Button -->
+    <button id="bee-btn" onclick="beeOpenChat()" style="
+        position:fixed;bottom:24px;right:18px;z-index:200;
+        width:52px;height:52px;border-radius:50%;border:none;
+        background:transparent;cursor:pointer;font-size:30px;
+        filter:drop-shadow(0 2px 8px rgba(0,0,0,0.22));
+        animation:beeFloat 2.4s ease-in-out infinite;
+        padding:0;line-height:1;
+    " title="Chat with your study bee!">🐝</button>
+
+    <!-- Bee Chat Modal -->
+    <div id="bee-modal" class="hidden" style="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="beeModalBgClick(event)">
+        <div id="bee-modal-box" class="bg-yellow-50 dark:bg-black border-2 border-yellow-400 dark:border-yellow-500" style="
+            width:100%;max-width:480px;
+            border-radius:28px 28px 0 0;
+            border-bottom:none;
+            display:flex;flex-direction:column;
+            height:72vh;
+            transform:translateY(100%);
+            transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1);
+            overflow:hidden;
+        ">
+            <!-- Header -->
+            <div class="bg-yellow-200 dark:bg-yellow-950 border-b border-yellow-300 dark:border-yellow-500" style="display:flex;align-items:center;gap:10px;padding:16px 18px 12px;">
+                <span style="font-size:26px;animation:beeFloat 2.4s ease-in-out infinite;">🐝</span>
+                <div style="flex:1;">
+                    <div class="text-black dark:text-yellow-300" style="font-weight:700;font-size:15px;">Bee — Study Guide</div>
+                    <div class="text-yellow-900 dark:text-yellow-400" style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">Powered by AI · knows your stats</div>
+                </div>
+                <button onclick="beeCloseChat()" class="text-yellow-900 dark:text-yellow-400 hover:text-black dark:hover:text-yellow-200" style="background:none;border:none;cursor:pointer;font-size:20px;padding:4px;line-height:1;">✕</button>
+            </div>
+
+            <!-- Messages -->
+            <div id="bee-messages" class="bg-white dark:bg-black" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+                <!-- injected by JS -->
+            </div>
+
+            <!-- Input -->
+            <div class="bg-yellow-200 dark:bg-yellow-950 border-t border-yellow-300 dark:border-yellow-500" style="padding:12px 14px;display:flex;gap:8px;align-items:flex-end;">
+                <textarea id="bee-input" rows="1" placeholder="Ask the bee anything..." oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onkeydown="beeInputKey(event)" class="bg-white dark:bg-yellow-950 text-black dark:text-yellow-300 border-yellow-400 dark:border-yellow-500" style="
+                    flex:1;resize:none;border:1.5px solid;border-radius:14px;
+                    padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;
+                    outline:none;max-height:100px;
+                    line-height:1.4;
+                "></textarea>
+                <button onclick="beeSend()" class="bg-black dark:bg-yellow-500 hover:bg-yellow-900 dark:hover:bg-yellow-400" style="
+                    width:38px;height:38px;border-radius:50%;border:none;
+                    color:#fef08a;cursor:pointer;font-size:16px;
+                    display:flex;align-items:center;justify-content:center;
+                    flex-shrink:0;
+                ">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes beeFloat {
+            0%,100% { transform:translateY(0) rotate(-4deg); }
+            50%      { transform:translateY(-8px) rotate(4deg); }
+        }
+        .bee-msg-bee {
+            align-self:flex-start;
+            background:#fef08a;
+            border:1.5px solid #fde047;
+            color:#000;
+            border-radius:18px 18px 18px 4px;
+            padding:10px 14px;
+            max-width:82%;
+            font-size:13px;
+            line-height:1.55;
+            font-family:'Inter',serif;
+        }
+        .dark .bee-msg-bee {
+            background:#1a1a00;
+            border-color:#eab308;
+            color:#fef08a;
+        }
+        .bee-msg-user {
+            align-self:flex-end;
+            background:#000;
+            color:#fef08a;
+            border-radius:18px 18px 4px 18px;
+            padding:10px 14px;
+            max-width:82%;
+            font-size:13px;
+            line-height:1.55;
+            font-family:'Inter',serif;
+            border:1.5px solid #eab308;
+        }
+        .dark .bee-msg-user {
+            background:#000;
+            color:#fef08a;
+            border-color:#eab308;
+        }
+        .bee-typing {
+            align-self:flex-start;
+            display:flex;gap:4px;align-items:center;
+            padding:10px 14px;
+            background:#fef08a;
+            border:1.5px solid #fde047;
+            border-radius:18px 18px 18px 4px;
+        }
+        .dark .bee-typing {
+            background:#1a1a00;
+            border-color:#eab308;
+        }
+        .bee-typing span {
+            width:6px;height:6px;border-radius:50%;background:#000;
+            animation:beeDot 1s infinite;
+        }
+        .dark .bee-typing span {
+            background:#fef08a;
+        }
+        .bee-typing span:nth-child(2){animation-delay:0.2s;}
+        .bee-typing span:nth-child(3){animation-delay:0.4s;}
+        @keyframes beeDot{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+        .dark #bee-modal-box { background:#000;border-color:#eab308; }
+        .dark #bee-modal-box > div:first-child { background:#1a1a00;border-color:#eab308; }
+        .dark #bee-modal-box > div:last-child { background:#1a1a00;border-color:#eab308; }
+        .dark #bee-input { background:#1a1a00;color:#fef08a;border-color:#eab308; }
+    </style>
+
+    <script>
+        let beeChatOpen = false;
+        let beeTyping = false;
+        let beeChatHistory = []; // {role, content}
+
+        function getBeeContext() {
+            const history = window.state ? window.state.history : {};
+            const totalHours = Object.values(history).reduce((a,b)=>a+b,0);
+            const daysLogged = Object.values(history).filter(h=>h>0).length;
+            const off = new Date().getTimezoneOffset()*60000;
+            const todayStr = (new Date(Date.now()-off)).toISOString().split('T')[0];
+            let streak=0, d=new Date();
+            if((history[todayStr]||0)===0) d.setDate(d.getDate()-1);
+            for(let i=0;i<365;i++){
+                const ds=(new Date(d.getTime()-d.getTimezoneOffset()*60000)).toISOString().split('T')[0];
+                if((history[ds]||0)>=1){streak++;d.setDate(d.getDate()-1);}else break;
+            }
+            let last7=0;
+            for(let i=0;i<7;i++){
+                const dd=new Date();dd.setDate(dd.getDate()-i);
+                const ds=(new Date(dd.getTime()-dd.getTimezoneOffset()*60000)).toISOString().split('T')[0];
+                last7+=(history[ds]||0);
+            }
+            return `Student stats: ${totalHours} total study hours, ${daysLogged} days logged, ${streak}-day streak, ${(last7/7).toFixed(1)}h/day avg this week.`;
+        }
+
+        function beeOpenChat() {
+            const modal = document.getElementById('bee-modal');
+            const box = document.getElementById('bee-modal-box');
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => { box.style.transform = 'translateY(0)'; });
+            beeChatOpen = true;
+            if (beeChatHistory.length === 0) beeGreet();
+        }
+
+        function beeCloseChat() {
+            const box = document.getElementById('bee-modal-box');
+            box.style.transform = 'translateY(100%)';
+            setTimeout(() => { 
+                const modal = document.getElementById('bee-modal');
+                modal.style.display = 'none'; 
+                modal.classList.add('hidden');
+            }, 350);
+            beeChatOpen = false;
+        }
+
+        function beeModalBgClick(e) {
+            if (e.target === document.getElementById('bee-modal')) beeCloseChat();
+        }
+
+        function beeInputKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); beeSend(); }
+        }
+
+        function beeAppendMsg(text, role) {
+            const el = document.createElement('div');
+            el.className = role === 'bee' ? 'bee-msg-bee' : 'bee-msg-user';
+            if (role === 'bee') el.innerHTML = '🐝 ' + text;
+            else el.textContent = text;
+            document.getElementById('bee-messages').appendChild(el);
+            el.scrollIntoView({behavior:'smooth'});
+            return el;
+        }
+
+        function beeShowTyping() {
+            const el = document.createElement('div');
+            el.className = 'bee-typing';
+            el.id = 'bee-typing-indicator';
+            el.innerHTML = '<span></span><span></span><span></span>';
+            document.getElementById('bee-messages').appendChild(el);
+            el.scrollIntoView({behavior:'smooth'});
+        }
+
+        function beeHideTyping() {
+            const el = document.getElementById('bee-typing-indicator');
+            if (el) el.remove();
+        }
+
+        async function beeGreet() {
+            beeShowTyping();
+            const systemPrompt = `You are a friendly, witty study bee 🐝 named Bee, guiding a JEE Class 11 student. Be concise, warm, and specific. ${getBeeContext()} Greet the student and give one sharp tip based on their stats.`;
+            try {
+                const res = await puter.ai.chat(systemPrompt, { model: 'gpt-4o-mini' });
+                const msg = typeof res === 'string' ? res : (res?.message?.content || res?.content || '');
+                beeHideTyping();
+                beeAppendMsg(msg, 'bee');
+                beeChatHistory.push({role:'assistant', content: msg});
+            } catch(e) {
+                beeHideTyping();
+                beeAppendMsg("Bzz! Couldn't reach the hive right now. Try again! 🍯", 'bee');
+            }
+        }
+
+        async function beeSend() {
+            const input = document.getElementById('bee-input');
+            const text = input.value.trim();
+            if (!text || beeTyping) return;
+            input.value = '';
+            input.style.height = 'auto';
+            beeAppendMsg(text, 'user');
+            beeChatHistory.push({role:'user', content: text});
+            beeTyping = true;
+            beeShowTyping();
+            const systemMsg = `You are a friendly, witty study bee 🐝 named Bee, guiding a JEE Class 11 student. Be concise and helpful. ${getBeeContext()}`;
+            const messages = [
+                {role:'system', content: systemMsg},
+                ...beeChatHistory.slice(-10)
+            ];
+            try {
+                const res = await puter.ai.chat(messages, { model: 'gpt-4o-mini' });
+                const msg = typeof res === 'string' ? res : (res?.message?.content || res?.content || '');
+                beeHideTyping();
+                beeAppendMsg(msg, 'bee');
+                beeChatHistory.push({role:'assistant', content: msg});
+            } catch(e) {
+                beeHideTyping();
+                beeAppendMsg("Bzz! Something went wrong. Try again! 🍯", 'bee');
+            }
+            beeTyping = false;
+        }
+    </script>
+
+</body>
+</html>

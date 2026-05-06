@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caffine AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Epilogue:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://js.puter.com/v2/"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f2eb;
+  --paper-soft: rgba(245,242,235,0.82);
+  --paper2: #edeae0;
+  --rule: rgba(13,13,13,0.1);
+  --rule-hard: rgba(13,13,13,0.23);
+  --accent: #c8392b;
+  --accent2: #2c4a9e;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Epilogue', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+}
+
+[data-theme="dark"] {
+  --ink: #e8e6e3;
+  --paper: #0f0f0f;
+  --paper-soft: rgba(15,15,15,0.84);
+  --paper2: #1a1a1a;
+  --rule: rgba(232,230,227,0.1);
+  --rule-hard: rgba(232,230,227,0.23);
+  --accent: #e85d4e;
+  --accent2: #6f8ee6;
+}
+
+html {
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+body {
+  min-height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(200,57,43,0.055), transparent 34%),
+    linear-gradient(315deg, rgba(44,74,158,0.055), transparent 32%),
+    repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+}
+
+[data-theme="dark"] body {
+  background:
+    linear-gradient(135deg, rgba(232,93,78,0.075), transparent 34%),
+    linear-gradient(315deg, rgba(111,142,230,0.075), transparent 32%),
+    repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 28px;
+  width: 1px;
+  background: rgba(200,57,43,0.35);
+  pointer-events: none;
+}
+
+.app {
+  height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 22px 20px 18px 44px;
+  gap: 14px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+
+.mark {
+  font-family: var(--font-display);
+  font-size: clamp(54px, 9vw, 86px);
+  line-height: 0.78;
+  letter-spacing: 0.03em;
+}
+
+.meta {
+  padding-bottom: 4px;
+  min-width: 0;
+}
+
+.meta-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.meta-copy {
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.58;
+  max-width: 560px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn {
+  min-height: 38px;
+  border: 1.5px solid var(--rule-hard);
+  border-radius: 999px;
+  background: var(--paper-soft);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.context-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pill {
+  border: 1px solid var(--rule-hard);
+  border-radius: 5px;
+  background: var(--paper-soft);
+  min-height: 58px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.pill-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.76;
+}
+
+.pill-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 0.9;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+}
+
+.prompt-band {
+  border-top: 1.5px solid var(--rule-hard);
+  border-bottom: 1.5px solid var(--rule-hard);
+  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.prompt-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 7vw, 64px);
+  line-height: 0.9;
+  letter-spacing: 0.03em;
+}
+
+.prompt-sub {
+  max-width: 520px;
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.58;
+}
+
+.messages {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0 12px;
+  scroll-behavior: smooth;
+}
+
+.messages::-webkit-scrollbar { width: 3px; }
+.messages::-webkit-scrollbar-thumb { background: var(--rule-hard); border-radius: 99px; }
+
+.msg {
+  max-width: min(760px, 88%);
+  display: flex;
+  flex-direction: column;
+}
+
+.msg.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.msg.assistant {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.bubble {
+  white-space: pre-wrap;
+  border: 1.5px solid var(--rule-hard);
+  border-radius: 5px;
+  padding: 13px 15px;
+  background: var(--paper-soft);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.035);
+}
+
+.bubble.markdown {
+  white-space: normal;
+}
+
+.bubble.markdown p,
+.bubble.markdown ul,
+.bubble.markdown ol,
+.bubble.markdown table,
+.bubble.markdown pre {
+  margin-bottom: 10px;
+}
+
+.bubble.markdown p:last-child,
+.bubble.markdown ul:last-child,
+.bubble.markdown ol:last-child,
+.bubble.markdown table:last-child,
+.bubble.markdown pre:last-child {
+  margin-bottom: 0;
+}
+
+.bubble.markdown ul,
+.bubble.markdown ol {
+  padding-left: 20px;
+}
+
+.bubble.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow: hidden;
+}
+
+.bubble.markdown th,
+.bubble.markdown td {
+  border: 1px solid var(--rule-hard);
+  padding: 7px 8px;
+  vertical-align: top;
+}
+
+.bubble.markdown th {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--paper2);
+}
+
+.bubble.markdown code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--paper2);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.bubble.markdown pre {
+  overflow-x: auto;
+  background: var(--paper2);
+  border: 1px solid var(--rule-hard);
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.bubble.markdown pre code {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+[data-theme="dark"] .bubble { box-shadow: none; }
+
+.msg.user .bubble {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.time {
+  margin-top: 5px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  opacity: 0.38;
+}
+
+.composer-wrap {
+  border: 1.5px solid var(--rule-hard);
+  border-radius: 999px;
+  background: var(--paper-soft);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.input {
+  width: 100%;
+  resize: none;
+  min-height: 44px;
+  max-height: 130px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  outline: none;
+  padding: 12px 10px 10px 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.input::placeholder { color: var(--ink); opacity: 0.42; }
+
+.send {
+  width: 48px;
+  height: 44px;
+  align-self: end;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.send:hover { background: var(--accent); }
+.send:disabled { opacity: 0.45; cursor: wait; }
+
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid var(--rule-hard);
+  background: var(--paper-soft);
+  border-radius: 5px;
+  padding: 13px 15px;
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.35;
+  animation: pop 1.2s infinite;
+}
+
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pop {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.28; }
+  40% { transform: translateY(-4px); opacity: 0.72; }
+}
+
+@media (min-width: 760px) {
+  body::before { left: 72px; }
+  .app { padding: 28px 72px 22px 90px; }
+}
+
+@media (max-width: 720px) {
+  body::before { left: 16px; }
+  .app {
+    padding: 14px 12px 12px 30px;
+    gap: 10px;
+  }
+  .topbar {
+    align-items: flex-start;
+  }
+  .brand {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .mark { font-size: 58px; }
+  .meta { padding-bottom: 0; }
+  .meta-copy { display: none; }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 9px;
+  }
+  .context-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pill {
+    min-height: 52px;
+    padding: 9px 10px;
+  }
+  .pill-value {
+    font-size: 21px;
+  }
+  .prompt-band {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px 0;
+    gap: 8px;
+  }
+  .prompt-title { font-size: 40px; }
+  .prompt-sub { font-size: 12px; }
+  .messages { gap: 12px; }
+  .msg { max-width: 94%; }
+  .bubble {
+    font-size: 13px;
+    padding: 11px 12px;
+  }
+  .composer-wrap {
+    border-radius: 18px;
+    align-items: end;
+  }
+  .send {
+    width: 44px;
+    height: 42px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">Caffine AI</div>
+      <div class="meta">
+        <div class="meta-title">All tools in context</div>
+        <p class="meta-copy">Planner, Ramindance, JEE progress, and todo data from this browser are read before every answer.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="index.html">Back</a>
+      <button class="btn" id="theme-btn" type="button">Theme</button>
+    </div>
+  </header>
+
+  <div class="context-row" aria-label="Available context">
+    <div class="pill">
+      <span class="pill-label">Planner</span>
+      <span class="pill-value" id="planner-chip">Empty</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">Ramindance</span>
+      <span class="pill-value" id="habit-chip">Empty</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">JEE Tracker</span>
+      <span class="pill-value" id="tracker-chip">Empty</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">To Do</span>
+      <span class="pill-value" id="todo-chip">Empty</span>
+    </div>
+  </div>
+
+  <main class="stage">
+    <section class="prompt-band">
+      <h1 class="prompt-title">What needs attention?</h1>
+      <p class="prompt-sub">Ask for a daily plan, weak subjects, pending tasks, discipline review, or a realistic next study move.</p>
+    </section>
+
+    <section class="messages" id="messages" aria-label="Chat messages"></section>
+  </main>
+
+  <form class="composer-wrap" id="composer">
+    <textarea class="input" id="input" rows="1" placeholder="Ask across all Caffine data..."></textarea>
+    <button class="send" id="send" type="submit">-&gt;</button>
+  </form>
+</div>
+
+<script>
+const savedTheme = localStorage.getItem('caffine-main-theme');
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+  document.documentElement.dataset.theme = 'dark';
+}
+
+document.getElementById('theme-btn').addEventListener('click', () => {
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('caffine-main-theme', 'light');
+  } else {
+    document.documentElement.dataset.theme = 'dark';
+    localStorage.setItem('caffine-main-theme', 'dark');
+  }
+});
+
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+const sendEl = document.getElementById('send');
+const chatHistory = [];
+
+function safeParse(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function localDateKey(date = new Date()) {
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().split('T')[0];
+}
+
+function hours(value) {
+  return `${Math.round((Number(value) || 0) * 10) / 10}h`;
+}
+
+function summarizePlanner() {
+  const saved = safeParse('lastTimetable', null);
+  if (!saved || !Array.isArray(saved.blocks) || !saved.blocks.length) return 'Planner: no saved timetable found.';
+  const blocks = saved.blocks;
+  const totalMin = blocks.reduce((sum, block) => sum + (Number(block.minutes) || 0), 0);
+  const studyMin = blocks.filter(block => block.type === 'STB').reduce((sum, block) => sum + (Number(block.minutes) || 0), 0);
+  const preview = blocks.slice(0, 16).map((block, index) => {
+    const time = block.timeDisplay && block.endDisplay ? `${block.timeDisplay}-${block.endDisplay}` : 'time n/a';
+    return `${index + 1}. ${time} ${block.type || 'BLOCK'}: ${block.title || 'Untitled'} (${block.minutes || 0}m)${block.note ? ' - ' + block.note : ''}`;
+  }).join('\n');
+  return `Planner: ${blocks.length} blocks, ${Math.round(totalMin / 60 * 10) / 10}h total, ${Math.round(studyMin / 60 * 10) / 10}h study. Subject/meta: ${saved.subject || saved.meta?.subject || 'unknown'}.\nTimetable preview:\n${preview}${blocks.length > 16 ? '\n...more blocks exist.' : ''}`;
+}
+
+function summarizeHabits() {
+  const data = safeParse('caffine_ramindance_data', {});
+  const history = data.history || {};
+  const entries = Object.entries(history).sort(([a], [b]) => a.localeCompare(b));
+  const totalHours = entries.reduce((sum, [, value]) => sum + (Number(value) || 0), 0);
+  const loggedDays = entries.filter(([, value]) => (Number(value) || 0) > 0).length;
+  const today = localDateKey();
+  const recent = entries.slice(-14).map(([day, value]) => {
+    const screen = data.screenTime?.[day] ?? 0;
+    const workout = data.workoutTime?.[day] ?? 0;
+    const water = data.waterGlasses?.[day] ?? 0;
+    const journal = data.journals?.[day] ? 'journal yes' : 'journal no';
+    return `${day}: ${hours(value)}, screen ${screen}m, workout ${workout}m, water ${water}, ${journal}`;
+  }).join('\n') || 'No daily entries.';
+  return `Ramindance: duration ${data.duration || 45} days, start ${data.startDateStr || 'not set'}, today ${hours(history[today] || 0)}, total ${hours(totalHours)}, logged days ${loggedDays}, theme ${data.themePalette || 'amber'}, dark mode ${data.darkMode !== false ? 'on' : 'off'}.\nRecent habit data:\n${recent}`;
+}
+
+function summarizeTrackerClass(label, data) {
+  if (!data || typeof data !== 'object') return `${label}: no data.`;
+  return ['math', 'physics', 'chemistry'].map(subject => {
+    const chapters = Array.isArray(data[subject]) ? data[subject] : [];
+    const total = chapters.length * 2;
+    const done = chapters.reduce((sum, chapter) => sum + (chapter.theory ? 1 : 0) + (chapter.questions ? 1 : 0), 0);
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const pending = chapters.filter(chapter => !chapter.theory || !chapter.questions).slice(0, 8).map(chapter => {
+      const missing = [chapter.theory ? null : 'theory', chapter.questions ? null : 'questions'].filter(Boolean).join('+');
+      return `${chapter.name} (${missing})`;
+    }).join('; ') || 'none';
+    return `${label} ${subject}: ${done}/${total}, ${pct}%, pending: ${pending}`;
+  }).join('\n');
+}
+
+function summarizeTracker() {
+  const active = localStorage.getItem('caffineActiveClass') || 'jee11';
+  const class11 = safeParse('caffineJee11', null);
+  const class12 = safeParse('caffineJee12', null);
+  return `JEE Tracker: active class ${active === 'jee12' ? 'Class XII' : 'Class XI'}.\n${summarizeTrackerClass('Class XI', class11)}\n${summarizeTrackerClass('Class XII', class12)}`;
+}
+
+function summarizeTodos() {
+  const tasks = safeParse('todoTasks', []);
+  if (!Array.isArray(tasks) || !tasks.length) return 'Todo: no saved tasks.';
+  const today = localDateKey();
+  const open = tasks.filter(task => !task.done);
+  const done = tasks.filter(task => task.done);
+  const overdue = open.filter(task => task.due && task.due < today);
+  const dueToday = open.filter(task => task.due === today);
+  const high = open.filter(task => task.priority === 'high');
+  const preview = open.slice(0, 16).map(task => {
+    const due = task.due ? `due ${task.due}` : 'no due date';
+    return `- ${task.title} [${task.priority || 'medium'} / ${task.category || 'General'} / ${due}]`;
+  }).join('\n') || 'No open tasks.';
+  return `Todo: ${tasks.length} total, ${open.length} open, ${done.length} done, ${dueToday.length} due today, ${overdue.length} overdue, ${high.length} high priority.\nOpen task preview:\n${preview}`;
+}
+
+function buildWorkspaceContext() {
+  const keys = Object.keys(localStorage).filter(key =>
+    key.includes('caffine') ||
+    key.includes('todo') ||
+    key.includes('Timetable') ||
+    key === 'theme'
+  ).sort();
+
+  return `You are Caffine AI, the assistant for this user's local Caffine study workspace.
+
+Current page: AllAi.html
+Current date: ${new Date().toString()}
+Available tools: index.html Main, planner.html Planner, habit.html Ramindance, tracker.html JEE, todolist.html To Do.
+
+WORKSPACE CONTEXT FROM THIS BROWSER:
+${summarizePlanner()}
+
+${summarizeHabits()}
+
+${summarizeTracker()}
+
+${summarizeTodos()}
+
+Known relevant localStorage keys: ${keys.join(', ') || 'none'}
+
+BEHAVIOR:
+- Use the context above as the user's real data.
+- Never invent data. If something is missing, say exactly what is missing.
+- Be specific with dates, tasks, chapters, hours, and percentages.
+- Help the user decide what to do next across all tools together.
+- Keep answers direct and useful.
+- Use Markdown tables for comparisons or plans when they improve readability.
+- Use LaTeX only when writing formulas, calculations, ratios, or math/physics/chemistry notation. Do not overuse it.
+- You cannot directly edit the other app pages from here. Give exact instructions for where to make changes when needed.`;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderMessageContent(text) {
+  if (window.marked?.parse) {
+    return marked.parse(text, { breaks: true, gfm: true });
+  }
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function updateChips() {
+  const planner = safeParse('lastTimetable', null);
+  const habits = safeParse('caffine_ramindance_data', {});
+  const todos = safeParse('todoTasks', []);
+  const active = localStorage.getItem('caffineActiveClass') || 'jee11';
+  const tracker = safeParse(active === 'jee12' ? 'caffineJee12' : 'caffineJee11', null);
+  document.getElementById('planner-chip').textContent = planner?.blocks?.length ? `${planner.blocks.length} blocks` : 'Empty';
+  document.getElementById('habit-chip').textContent = habits?.history ? `${Object.keys(habits.history).length} days` : 'Empty';
+  document.getElementById('tracker-chip').textContent = tracker ? (active === 'jee12' ? '12th' : '11th') : 'Empty';
+  document.getElementById('todo-chip').textContent = Array.isArray(todos) ? `${todos.filter(task => !task.done).length} open` : 'Empty';
+}
+
+function addMessage(role, text) {
+  const msg = document.createElement('div');
+  msg.className = `msg ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = role === 'assistant' ? 'bubble markdown' : 'bubble';
+  if (role === 'assistant') {
+    bubble.innerHTML = renderMessageContent(text);
+  } else {
+    bubble.textContent = text;
+  }
+  const time = document.createElement('div');
+  time.className = 'time';
+  time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  msg.appendChild(bubble);
+  msg.appendChild(time);
+  messagesEl.appendChild(msg);
+  if (role === 'assistant' && window.MathJax?.typesetPromise) {
+    MathJax.typesetPromise([bubble]).catch(() => {});
+  }
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function addTyping() {
+  const msg = document.createElement('div');
+  msg.className = 'msg assistant';
+  msg.id = 'typing';
+  msg.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  messagesEl.appendChild(msg);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+  document.getElementById('typing')?.remove();
+}
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text) return;
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  sendEl.disabled = true;
+  addTyping();
+
+  try {
+    if (!window.puter?.ai?.chat) throw new Error('Puter AI unavailable');
+    const messages = [
+      { role: 'system', content: buildWorkspaceContext() },
+      ...chatHistory.slice(-14)
+    ];
+    const res = await puter.ai.chat(messages, { model: 'gpt-4o-mini' });
+    const reply = typeof res === 'string' ? res : (res?.message?.content || res?.content || String(res));
+    removeTyping();
+    addMessage('assistant', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (error) {
+    removeTyping();
+    addMessage('assistant', 'I could not reach Puter AI right now. Check your internet connection and try again.');
+    console.error(error);
+  }
+
+  sendEl.disabled = false;
+  inputEl.focus();
+}
+
+document.getElementById('composer').addEventListener('submit', event => {
+  event.preventDefault();
+  sendMessage();
+});
+
+inputEl.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 130) + 'px';
+});
+
+inputEl.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
+updateChips();
+addMessage('assistant', 'Hey. I can read your saved Caffine data from this browser: planner, Ramindance, JEE tracker, and todo list. Ask me what needs attention or what to do next.');
+setTimeout(() => inputEl.focus(), 100);
+</script>
+</body>
+</html>

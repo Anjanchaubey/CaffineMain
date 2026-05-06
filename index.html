@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caffine</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Caffine">
+<meta name="theme-color" content="#f5f2eb">
+<link rel="icon" type="image/png" sizes="32x32" href="icon.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="icon.png?v=2">
+<link rel="shortcut icon" href="icon.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Epilogue:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f2eb;
+  --paper2: #edeae0;
+  --rule: rgba(13,13,13,0.1);
+  --rule-hard: rgba(13,13,13,0.24);
+  --accent: #c8392b;
+  --accent2: #2c4a9e;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Epilogue', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+}
+
+[data-theme="dark"] {
+  --ink: #e8e6e3;
+  --paper: #0f0f0f;
+  --paper2: #1a1a1a;
+  --rule: rgba(232,230,227,0.1);
+  --rule-hard: rgba(232,230,227,0.24);
+  --accent: #e85d4e;
+  --accent2: #5a7bc7;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+body {
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(200,57,43,0.045), transparent 36%),
+    linear-gradient(315deg, rgba(44,74,158,0.045), transparent 32%),
+    repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+}
+
+[data-theme="dark"] body {
+  background:
+    linear-gradient(135deg, rgba(232,93,78,0.06), transparent 36%),
+    linear-gradient(315deg, rgba(90,123,199,0.06), transparent 32%),
+    repeating-linear-gradient(to bottom, transparent, transparent 39px, var(--rule) 39px, var(--rule) 40px);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 28px;
+  width: 1px;
+  background: rgba(200,57,43,0.35);
+  pointer-events: none;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 28px 22px 28px 44px;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mini-brand {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  padding: 5px 8px;
+  opacity: 0.78;
+}
+
+.theme-btn {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--rule-hard);
+  background: rgba(245,242,235,0.58);
+  color: var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+[data-theme="dark"] .theme-btn { background: rgba(26,26,26,0.7); }
+.theme-btn:hover { background: var(--ink); color: var(--paper); }
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 680px;
+  padding-bottom: 28px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: clamp(66px, 14vw, 118px);
+  line-height: 0.84;
+  letter-spacing: 0.02em;
+}
+
+.copy {
+  max-width: 500px;
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  opacity: 0.66;
+}
+
+.chips {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule-hard);
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: rgba(245,242,235,0.56);
+  opacity: 0.74;
+}
+
+[data-theme="dark"] .chip { background: rgba(26,26,26,0.62); }
+
+.dock {
+  align-self: center;
+  width: min(100%, 780px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1.5px solid var(--rule-hard);
+  border-radius: 999px;
+  padding: 7px;
+  background: rgba(245,242,235,0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+[data-theme="dark"] .dock { background: rgba(15,15,15,0.78); }
+
+.tool {
+  min-height: 44px;
+  min-width: 0;
+  flex: 1;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 9px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.tool:hover,
+.tool.ai {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.tool:hover { transform: translateY(-2px); }
+
+.tool-mark {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--accent);
+}
+
+.tool:hover .tool-mark,
+.tool.ai .tool-mark { color: var(--paper); }
+
+@media (min-width: 760px) {
+  body::before { left: 72px; }
+  .page { padding: 34px 72px 30px 90px; }
+}
+
+@media (max-width: 680px) {
+  body { overflow-y: auto; }
+  body::before { left: 16px; }
+  .page {
+    min-height: 100svh;
+    padding: 18px 14px 18px 30px;
+  }
+  .hero {
+    padding: 56px 0 24px;
+    justify-content: flex-start;
+  }
+  .brand { font-size: clamp(62px, 22vw, 92px); }
+  .copy { font-size: 13px; margin-top: 16px; }
+  .chips { margin-top: 18px; }
+  .dock {
+    align-self: stretch;
+    border-radius: 18px;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    gap: 6px;
+    padding: 6px;
+  }
+  .tool {
+    flex: 1 1 calc(33.333% - 6px);
+    min-height: 42px;
+    border-radius: 13px;
+    font-size: 8px;
+    padding: 0 6px;
+  }
+  .tool.ai {
+    flex-basis: 100%;
+  }
+  .tool-mark { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="mini-brand">Caffine Desk</div>
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Toggle dark mode">DM</button>
+    </header>
+
+    <main class="hero">
+      <p class="eyebrow">Study system / planner / tracker</p>
+      <img src="c 2.png" alt="Caffine" class="brand" style="max-width: 400px; height: auto;">
+      <p class="copy">
+        A compact home for planning the day, tracking discipline, clearing tasks, and checking JEE progress.
+      </p>
+      <div class="chips" aria-label="Workspace summary">
+        <span class="chip">5 tools</span>
+        <span class="chip">Local context</span>
+        <span class="chip">Focused study</span>
+      </div>
+    </main>
+
+    <nav class="dock" aria-label="Main tools">
+      <a class="tool" href="planner.html"><span class="tool-mark">P</span><span>Planner</span></a>
+      <a class="tool" href="habit.html"><span class="tool-mark">R</span><span>Ramindance</span></a>
+      <a class="tool" href="tracker.html"><span class="tool-mark">J</span><span>JEE</span></a>
+      <a class="tool" href="todolist.html"><span class="tool-mark">T</span><span>To Do</span></a>
+      <a class="tool ai" href="AllAi.html"><span class="tool-mark">AI</span><span>Ask</span></a>
+    </nav>
+  </div>
+
+  <script>
+    const savedTheme = localStorage.getItem('caffine-main-theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.dataset.theme = 'dark';
+    }
+
+    document.getElementById('theme-btn').addEventListener('click', () => {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('caffine-main-theme', 'light');
+      } else {
+        document.documentElement.dataset.theme = 'dark';
+        localStorage.setItem('caffine-main-theme', 'dark');
+      }
+    });
+  </script>
+</body>
+</html>

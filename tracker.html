@@ -1,0 +1,1044 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caffine — JEE 11</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        math: '#ef4444',        // Red
+                        physics: '#22c55e',     // Green
+                        chemistry: '#a855f7',   // Purple
+                        dark: '#0a0a0a',
+                        card: '#111111',
+                    },
+                    fontFamily: {
+                        display: ['Syne', 'sans-serif'],
+                        body: ['DM Sans', 'sans-serif'],
+                        mono: ['DM Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #f8f5f0;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .dark body { background-color: #0a0a0a; }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        .dark body::before { opacity: 0.12; }
+
+        /* Scrollbar */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #333; }
+
+        /* Glass Header */
+        .glass-header {
+            background: rgba(248, 245, 240, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .dark .glass-header {
+            background: rgba(10, 10, 10, 0.88);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* Cards */
+        .soft-card {
+            background: #ffffff;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+        }
+        .dark .soft-card {
+            background: #111111;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
+        }
+        .subject-card {
+            position: relative;
+            border-radius: 20px;
+            border: 1px solid rgba(15,23,42,0.06);
+            box-shadow: 0 18px 45px rgba(15,23,42,0.06), 0 1px 0 rgba(255,255,255,0.8) inset;
+        }
+        .dark .subject-card {
+            border-color: rgba(255,255,255,0.06);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.42), 0 1px 0 rgba(255,255,255,0.05) inset;
+        }
+        .subject-card::after {
+            content: '';
+            position: absolute;
+            inset: auto 18px 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(15,23,42,0.14), transparent);
+            opacity: 0.5;
+        }
+
+        /* Subject card headers */
+        .header-math { background: linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(239,68,68,0.03) 100%); border-bottom: 1px solid rgba(239,68,68,0.12); }
+        .header-physics { background: linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.03) 100%); border-bottom: 1px solid rgba(34,197,94,0.12); }
+        .header-chemistry { background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(168,85,247,0.03) 100%); border-bottom: 1px solid rgba(168,85,247,0.12); }
+
+        .dark .header-math { background: linear-gradient(135deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.04) 100%); border-bottom: 1px solid rgba(239,68,68,0.18); }
+        .dark .header-physics { background: linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.04) 100%); border-bottom: 1px solid rgba(34,197,94,0.18); }
+        .dark .header-chemistry { background: linear-gradient(135deg, rgba(168,85,247,0.12) 0%, rgba(168,85,247,0.04) 100%); border-bottom: 1px solid rgba(168,85,247,0.18); }
+
+        /* Progress bar */
+        .progress-transition { transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+
+        /* Checkbox */
+        .check-wrap input:checked + .check-box {
+            transform: scale(1);
+        }
+        .check-box { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .check-box svg { transition: opacity 0.2s, transform 0.2s; }
+
+        /* Row hover */
+        .chapter-row { transition: background 0.15s ease; }
+        .chapter-row:hover { background: rgba(0,0,0,0.025); }
+        .dark .chapter-row:hover { background: rgba(255,255,255,0.025); }
+
+        /* Tag label */
+        .tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Rank badge */
+        .rank-badge {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Section label */
+        .section-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        /* Stat number */
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Chapter name */
+        .chapter-name {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Glow bars */
+        .glow-math { box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+        .glow-physics { box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+        .glow-chemistry { box-shadow: 0 0 8px rgba(168,85,247,0.5); }
+
+        /* Sub-section divider */
+        .subsection-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .class-switcher {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(15,23,42,0.08);
+            box-shadow: 0 10px 28px rgba(15,23,42,0.07);
+        }
+        .dark .class-switcher {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.08);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+        }
+        .class-tab {
+            min-width: 86px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(15,23,42,0.55);
+            transition: all 0.18s ease;
+        }
+        .dark .class-tab { color: rgba(229,231,235,0.55); }
+        .class-tab.active {
+            color: #fff;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            box-shadow: 0 8px 20px rgba(15,23,42,0.18);
+        }
+        .dark .class-tab.active {
+            color: #0a0a0a;
+            background: linear-gradient(135deg, #f8fafc, #cbd5e1);
+        }
+        .class-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 22px;
+            border: 1px solid rgba(15,23,42,0.07);
+            background:
+                radial-gradient(circle at 12% 18%, rgba(239,68,68,0.14), transparent 28%),
+                radial-gradient(circle at 80% 10%, rgba(34,197,94,0.12), transparent 24%),
+                radial-gradient(circle at 60% 90%, rgba(168,85,247,0.12), transparent 30%),
+                rgba(255,255,255,0.76);
+            box-shadow: 0 18px 45px rgba(15,23,42,0.07);
+        }
+        .dark .class-hero {
+            border-color: rgba(255,255,255,0.07);
+            background:
+                radial-gradient(circle at 12% 18%, rgba(239,68,68,0.18), transparent 28%),
+                radial-gradient(circle at 80% 10%, rgba(34,197,94,0.14), transparent 24%),
+                radial-gradient(circle at 60% 90%, rgba(168,85,247,0.14), transparent 30%),
+                rgba(17,17,17,0.78);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.38);
+        }
+        .class-hero-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+        .class-hero-copy {
+            max-width: 560px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 640px) {
+            body { padding-bottom: 56px; }
+
+            .glass-header {
+                background: rgba(248, 245, 240, 0.94);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+            }
+            .dark .glass-header { background: rgba(10, 10, 10, 0.94); }
+
+            .mobile-header-shell { padding: 10px 16px 12px; }
+            .mobile-brand-logo { width: 34px; height: 34px; }
+            .mobile-icon-button { width: 34px; height: 34px; }
+            .mobile-main { padding-top: 104px; }
+
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px !important;
+                margin: 0 0 18px !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .stats-grid .soft-card {
+                min-width: 0;
+                height: 104px;
+                padding: 14px;
+                border-radius: 18px;
+            }
+            .stats-grid .soft-card:first-child {
+                gap: 10px;
+            }
+            .stats-grid .soft-card:first-child > .relative {
+                width: 58px !important;
+                height: 58px !important;
+            }
+            .stats-grid .soft-card:first-child svg {
+                width: 58px;
+                height: 58px;
+            }
+            .stats-grid .stat-num,
+            .stats-grid .rank-badge { font-size: 20px; }
+            .stats-grid .section-label { font-size: 8px; }
+
+            .class-hero {
+                border-radius: 18px;
+                margin-bottom: 18px;
+                padding: 18px;
+                gap: 16px;
+            }
+            .class-hero-title {
+                font-size: 28px;
+                line-height: 1;
+            }
+            .class-hero-copy {
+                font-size: 13px;
+                line-height: 1.45;
+            }
+            .class-switcher {
+                width: auto;
+                align-self: flex-start;
+                display: inline-flex;
+                border-radius: 999px;
+                padding: 3px;
+            }
+            .class-tab {
+                min-width: 62px;
+                padding: 7px 10px;
+                border-radius: 999px;
+                font-size: 9px;
+            }
+
+            .subject-card {
+                border-radius: 18px;
+                box-shadow: 0 12px 30px rgba(15,23,42,0.06), 0 1px 0 rgba(255,255,255,0.8) inset;
+            }
+            .dark .subject-card {
+                box-shadow: 0 12px 30px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.05) inset;
+            }
+            .subject-card > div:first-child { padding: 14px 16px; }
+
+            .chapter-row {
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px 10px;
+                border-radius: 14px;
+            }
+            .chapter-name {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+                font-size: 13px;
+                line-height: 1.3;
+                overflow-wrap: anywhere;
+            }
+            .check-wrap {
+                gap: 5px;
+                padding-top: 1px;
+            }
+            .check-wrap .relative {
+                width: 22px !important;
+                height: 22px !important;
+            }
+            .check-box { border-radius: 7px; }
+            .check-box svg {
+                width: 13px;
+                height: 13px;
+            }
+            .subsection-label { font-size: 8px; }
+        }
+
+        /* Hero splash */
+        #hero-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8f5f0;
+            transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+            pointer-events: all;
+        }
+        .dark #hero-splash { background: #0a0a0a; }
+        #hero-splash.dismissed {
+            opacity: 0;
+            transform: translateY(-32px) scale(0.97);
+            pointer-events: none;
+        }
+
+        @keyframes nudge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(7px)} }
+        .nudge { animation: nudge 1.5s ease-in-out infinite; }
+
+        #main-content {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s;
+        }
+        #main-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-slate-600 dark:text-gray-400 min-h-screen pb-24">
+
+    <!-- Hero Splash -->
+    <div id="hero-splash" onclick="dismissSplash()">
+        <p class="section-label mb-6 text-slate-400 dark:text-gray-600">JEE · <span id="hero-class-label">Class XI</span> · Overall Progress</p>
+        <div class="relative" style="width:180px;height:180px;">
+            <svg id="hero-ring-svg" width="180" height="180" viewBox="0 0 180 180" style="transform:rotate(-90deg);">
+                <circle cx="90" cy="90" r="72" fill="none" stroke-width="10" style="stroke:rgba(0,0,0,0.07);"/>
+                <circle id="hero-arc-math" cx="90" cy="90" r="72" fill="none" stroke-width="10"
+                    stroke="#ef4444" stroke-linecap="round"
+                    stroke-dasharray="452.39" stroke-dashoffset="452.39"
+                    style="transition:stroke-dashoffset 1.3s cubic-bezier(0.22,1,0.36,1);"/>
+                <circle id="hero-arc-physics" cx="90" cy="90" r="72" fill="none" stroke-width="10"
+                    stroke="#22c55e" stroke-linecap="round"
+                    stroke-dasharray="452.39" stroke-dashoffset="452.39"
+                    style="transition:stroke-dashoffset 1.3s cubic-bezier(0.22,1,0.36,1) 0.1s;"/>
+                <circle id="hero-arc-chemistry" cx="90" cy="90" r="72" fill="none" stroke-width="10"
+                    stroke="#a855f7" stroke-linecap="round"
+                    stroke-dasharray="452.39" stroke-dashoffset="452.39"
+                    style="transition:stroke-dashoffset 1.3s cubic-bezier(0.22,1,0.36,1) 0.2s;"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                <span id="hero-pct" class="stat-num text-4xl text-slate-900 dark:text-gray-100 leading-none">0%</span>
+                <span class="section-label">complete</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-5 mt-8">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-math inline-block"></span><span class="tag opacity-60">Math</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-physics inline-block"></span><span class="tag opacity-60">Physics</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-chemistry inline-block"></span><span class="tag opacity-60">Chem</span></div>
+        </div>
+        <div class="nudge mt-10 flex flex-col items-center gap-1 cursor-pointer" onclick="dismissSplash()">
+            <span class="section-label">scroll to continue</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-30">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Sticky Header -->
+    <header class="fixed top-0 w-full z-50 glass-header">
+        <div class="mobile-header-shell max-w-6xl mx-auto px-4 py-3 md:px-6 md:py-4">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-3">
+                    <button onclick="window.location.href='index.html'" class="mobile-icon-button h-8 w-8 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors flex items-center justify-center text-slate-500 dark:text-gray-400 focus:outline-none">
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                    </button>
+                    <img src="logo.png" alt="Caffine" class="mobile-brand-logo w-10 h-10">
+                    <div>
+                        <h1 class="font-display text-sm font-700 tracking-tight text-slate-900 dark:text-gray-100 leading-tight" style="font-family:'Syne',sans-serif;font-weight:700;">Caffine</h1>
+                        <div class="flex items-center gap-1.5">
+                            <span id="sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-colors duration-300"></span>
+                            <span id="sync-status-text" class="tag text-slate-400 dark:text-gray-500">Offline</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="tag text-slate-400 dark:text-gray-600 hidden sm:block">JEE · <span id="header-class-label">Class XI</span></span>
+                    <button onclick="toggleTheme()" class="mobile-icon-button h-8 w-8 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors flex items-center justify-center text-slate-500 dark:text-gray-400 focus:outline-none">
+                        <i class="fa-solid fa-moon dark:hidden text-xs"></i>
+                        <i class="fa-solid fa-sun hidden dark:block text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Global Progress -->
+            <div class="flex items-center gap-3">
+                <div class="flex-1 bg-black/8 dark:bg-white/8 rounded-full h-1 overflow-hidden" style="background:rgba(0,0,0,0.08)">
+                    <div id="global-progress" class="h-full rounded-full progress-transition" style="width:0%;background:linear-gradient(90deg,#ef4444,#a855f7,#22c55e);"></div>
+                </div>
+                <span id="global-percentage" class="tag text-slate-900 dark:text-white w-8 text-right" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:500;">0%</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="mobile-main max-w-6xl mx-auto px-4 pt-28 md:px-6 md:pt-32">
+    <div id="main-content">
+
+        <!-- Stats Row -->
+        <div class="stats-grid flex md:grid md:grid-cols-4 overflow-x-auto snap-x snap-mandatory gap-4 mb-8 pb-2 md:pb-0 hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+
+            <!-- Circular Progress -->
+            <div class="soft-card p-5 rounded-2xl flex items-center gap-4 h-28 min-w-[80vw] sm:min-w-[42vw] md:min-w-0 snap-center">
+                <div class="relative shrink-0" style="width:72px;height:72px;">
+                    <svg width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(-90deg);">
+                        <!-- Track -->
+                        <circle cx="36" cy="36" r="28" fill="none" stroke-width="5"
+                            class="stroke-slate-100 dark:stroke-white/8" style="stroke:rgba(0,0,0,0.07);"/>
+                        <!-- Math arc -->
+                        <circle id="arc-math" cx="36" cy="36" r="28" fill="none" stroke-width="5"
+                            stroke="#ef4444" stroke-linecap="round"
+                            stroke-dasharray="175.93" stroke-dashoffset="175.93"
+                            style="transition:stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1);"/>
+                        <!-- Physics arc -->
+                        <circle id="arc-physics" cx="36" cy="36" r="28" fill="none" stroke-width="5"
+                            stroke="#22c55e" stroke-linecap="round"
+                            stroke-dasharray="175.93" stroke-dashoffset="175.93"
+                            style="transition:stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1) 0.1s;"/>
+                        <!-- Chemistry arc -->
+                        <circle id="arc-chemistry" cx="36" cy="36" r="28" fill="none" stroke-width="5"
+                            stroke="#a855f7" stroke-linecap="round"
+                            stroke-dasharray="175.93" stroke-dashoffset="175.93"
+                            style="transition:stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1) 0.2s;"/>
+                    </svg>
+                    <!-- Center text -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="ring-pct" class="stat-num text-sm text-slate-900 dark:text-gray-100 leading-none">0%</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <span class="section-label">Overall</span>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-math inline-block"></span><span class="tag opacity-60">Math</span></div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-physics inline-block"></span><span class="tag opacity-60">Physics</span></div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-chemistry inline-block"></span><span class="tag opacity-60">Chem</span></div>
+                </div>
+            </div>
+
+            <div class="soft-card p-5 rounded-2xl flex flex-col justify-between h-28 min-w-[80vw] sm:min-w-[42vw] md:min-w-0 snap-center">
+                <div class="flex justify-between items-start">
+                    <span class="section-label">Tasks Done</span>
+                    <div class="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+                        <i class="fa-solid fa-check text-emerald-500 text-[10px]"></i>
+                    </div>
+                </div>
+                <h3 class="stat-num text-2xl text-slate-900 dark:text-gray-100 mt-auto" id="total-tasks-done">0/0</h3>
+            </div>
+
+            <div class="soft-card p-5 rounded-2xl flex flex-col justify-between h-28 min-w-[80vw] sm:min-w-[42vw] md:min-w-0 snap-center">
+                <div class="flex justify-between items-start">
+                    <span class="section-label">Rank</span>
+                    <div class="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                        <i class="fa-solid fa-fire text-amber-500 text-[10px]"></i>
+                    </div>
+                </div>
+                <h3 class="rank-badge text-2xl text-amber-500 mt-auto" id="user-rank">Novice</h3>
+            </div>
+
+            <div class="soft-card p-5 rounded-2xl flex flex-col justify-between h-28 min-w-[80vw] sm:min-w-[42vw] md:min-w-0 snap-center">
+                <div class="flex justify-between items-start">
+                    <span class="section-label">Focus On</span>
+                    <div class="w-6 h-6 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
+                        <i class="fa-solid fa-crosshairs text-rose-400 text-[10px]"></i>
+                    </div>
+                </div>
+                <h3 class="stat-num text-xl text-slate-900 dark:text-gray-100 mt-auto truncate" id="focus-area">Balanced</h3>
+            </div>
+        </div>
+
+        <div class="class-toggle-row mb-5 md:mb-7">
+            <div class="class-switcher">
+                <button id="tab-jee11" class="class-tab active" onclick="setActiveClass('jee11')">11th</button>
+                <button id="tab-jee12" class="class-tab" onclick="setActiveClass('jee12')">12th</button>
+            </div>
+        </div>
+
+        <!-- Subject Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            <!-- ── MATHEMATICS ── -->
+            <div class="soft-card subject-card overflow-hidden flex flex-col">
+                <div class="header-math px-5 py-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-red-500/10 dark:bg-red-500/15 flex items-center justify-center">
+                                <i class="fa-solid fa-square-root-variable text-math text-xs"></i>
+                            </div>
+                            <h2 style="font-family:'Syne',sans-serif;font-weight:700;" class="text-base text-slate-900 dark:text-gray-100">Mathematics</h2>
+                        </div>
+                        <span id="math-text" class="tag text-math">0%</span>
+                    </div>
+                    <div class="w-full bg-red-100/50 dark:bg-red-900/20 rounded-full h-0.5">
+                        <div id="math-bar" class="bg-math h-0.5 rounded-full progress-transition glow-math" style="width:0%"></div>
+                    </div>
+                </div>
+                <div id="math-list" class="p-3 space-y-0.5 flex-grow"></div>
+            </div>
+
+            <!-- ── PHYSICS ── -->
+            <div class="soft-card subject-card overflow-hidden flex flex-col">
+                <div class="header-physics px-5 py-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-green-500/10 dark:bg-green-500/15 flex items-center justify-center">
+                                <i class="fa-solid fa-bolt text-physics text-xs"></i>
+                            </div>
+                            <h2 style="font-family:'Syne',sans-serif;font-weight:700;" class="text-base text-slate-900 dark:text-gray-100">Physics</h2>
+                        </div>
+                        <span id="physics-text" class="tag text-physics">0%</span>
+                    </div>
+                    <div class="w-full bg-green-100/50 dark:bg-green-900/20 rounded-full h-0.5">
+                        <div id="physics-bar" class="bg-physics h-0.5 rounded-full progress-transition glow-physics" style="width:0%"></div>
+                    </div>
+                </div>
+                <div id="physics-list" class="p-3 space-y-0.5 flex-grow"></div>
+            </div>
+
+            <!-- ── CHEMISTRY ── -->
+            <div class="soft-card subject-card overflow-hidden flex flex-col">
+                <div class="header-chemistry px-5 py-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-purple-500/10 dark:bg-purple-500/15 flex items-center justify-center">
+                                <i class="fa-solid fa-flask text-chemistry text-xs"></i>
+                            </div>
+                            <h2 style="font-family:'Syne',sans-serif;font-weight:700;" class="text-base text-slate-900 dark:text-gray-100">Chemistry</h2>
+                        </div>
+                        <span id="chemistry-text" class="tag text-chemistry">0%</span>
+                    </div>
+                    <div class="w-full bg-purple-100/50 dark:bg-purple-900/20 rounded-full h-0.5">
+                        <div id="chemistry-bar" class="bg-chemistry h-0.5 rounded-full progress-transition glow-chemistry" style="width:0%"></div>
+                    </div>
+                </div>
+                <div id="chemistry-list" class="p-3 space-y-0.5 flex-grow"></div>
+            </div>
+
+        </div>
+
+        <div class="mt-12 text-center">
+            <p class="tag text-slate-300 dark:text-gray-700">
+                Keep going · JEE 2026 ·  11th + 12th tracker
+            </p>
+        </div>
+    </div>
+    </main>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYY2GQqS0tCXb7Oxw8AWXhpexq9e8VRUs",
+            authDomain: "aspirehub-32863.firebaseapp.com",
+            projectId: "aspirehub-32863",
+            storageBucket: "aspirehub-32863.appspot.com",
+            messagingSenderId: "686810111182",
+            appId: "1:686810111182:web:4290b4b1b6e64934ec449f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'syllabus-tracker-jee';
+
+        let currentUser = null;
+
+        const statusDot = document.getElementById('sync-status-dot');
+        const statusText = document.getElementById('sync-status-text');
+
+        function setStatus(state) {
+            if (state === 'offline') { statusDot.className = "w-1.5 h-1.5 rounded-full bg-slate-300 transition-colors duration-300"; statusText.innerText = "Offline"; }
+            else if (state === 'syncing') { statusDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse transition-colors duration-300"; statusText.innerText = "Syncing"; }
+            else if (state === 'synced') { statusDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 transition-colors duration-300"; statusText.innerText = "Synced"; }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                setStatus('syncing');
+                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'syllabus');
+                onSnapshot(docRef, (snap) => {
+                    if (snap.exists()) {
+                        const cloud = snap.data();
+                        window.cloudSyllabus = cloud;
+                        const active = window.activeClass || 'jee11';
+                        if (cloud[active]) {
+                            localStorage.setItem(window.getStorageKey(active), JSON.stringify(cloud[active]));
+                            window.appData = cloud[active];
+                            init();
+                        }
+                        setStatus('synced');
+                    } else {
+                        window.saveToCloud && window.saveToCloud();
+                    }
+                }, () => setStatus('offline'));
+            } else {
+                currentUser = null;
+                setStatus('offline');
+                setTimeout(() => { if (!auth.currentUser) window.location.href = 'login.html'; }, 1000);
+            }
+        });
+
+        window.saveToCloud = async function() {
+            if (!currentUser) { setStatus('offline'); return; }
+            setStatus('syncing');
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'syllabus'), { [window.activeClass || 'jee11']: window.appData }, { merge: true });
+                setStatus('synced');
+            } catch(e) { console.error(e); setStatus('offline'); }
+        };
+    </script>
+
+    <script>
+        // ── SYLLABUS DATA ──────────────────────────────────────────────
+        const defaultDataByClass = {
+          jee11: {
+            math: [
+                // No sub-section tag needed — rendered flat, but grouped via section dividers
+                { name: "Sets, Relations & Functions",          section: "Algebra",       theory: false, questions: false },
+                { name: "Trigonometric Functions",              section: "Trigonometry",  theory: false, questions: false },
+                { name: "Trigonometric Equations & Identities", section: "Trigonometry",  theory: false, questions: false },
+                { name: "Limits & Continuity (basic)",          section: "Calculus",      theory: false, questions: false },
+                { name: "Straight Lines",                       section: "Coordinate",    theory: false, questions: false },
+                { name: "Permutations & Combinations",          section: "Algebra",       theory: false, questions: false },
+                { name: "Binomial Theorem",                     section: "Algebra",       theory: false, questions: false },
+            ],
+            physics: [
+                { name: "Units & Measurements",     section: "Basics",     theory: false, questions: false },
+                { name: "Vectors",                  section: "Basics",     theory: false, questions: false },
+                { name: "Basic Mathematics",        section: "Basics",     theory: false, questions: false },
+                { name: "Kinematics",               section: "Mechanics",  theory: false, questions: false },
+                { name: "Laws of Motion",           section: "Mechanics",  theory: false, questions: false },
+                { name: "Work, Energy & Power",     section: "Mechanics",  theory: false, questions: false },
+                { name: "Centre of Mass",           section: "Mechanics",  theory: false, questions: false },
+                { name: "Rotational Motion",        section: "Mechanics",  theory: false, questions: false },
+                { name: "Basic Thermodynamics",     section: "Thermal",    theory: false, questions: false },
+            ],
+            chemistry: [
+                { name: "Mole Concept",             section: "Physical",  theory: false, questions: false },
+                { name: "Atomic Structure",         section: "Physical",  theory: false, questions: false },
+                { name: "Thermodynamics",           section: "Physical",  theory: false, questions: false },
+                { name: "Chemical & Ionic Equilibrium", section: "Physical", theory: false, questions: false },
+                { name: "Periodic Table & Periodicity", section: "Inorganic", theory: false, questions: false },
+                { name: "Chemical Bonding",         section: "Inorganic", theory: false, questions: false },
+                { name: "General Organic Chemistry (GOC)", section: "Organic", theory: false, questions: false },
+                { name: "Hydrocarbons (basic)",     section: "Organic",   theory: false, questions: false },
+            ]
+          },
+          jee12: {
+            math: [
+                { name: "Relations and Functions", section: "Relations & Functions", theory: false, questions: false },
+                { name: "Inverse Trigonometric Functions", section: "Relations & Functions", theory: false, questions: false },
+                { name: "Matrices", section: "Algebra", theory: false, questions: false },
+                { name: "Determinants", section: "Algebra", theory: false, questions: false },
+                { name: "Continuity and Differentiability", section: "Calculus", theory: false, questions: false },
+                { name: "Applications of Derivatives", section: "Calculus", theory: false, questions: false },
+                { name: "Integrals: Definite and Indefinite", section: "Calculus", theory: false, questions: false },
+                { name: "Applications of Integrals", section: "Calculus", theory: false, questions: false },
+                { name: "Differential Equations", section: "Calculus", theory: false, questions: false },
+                { name: "Vector Algebra", section: "Vectors & 3D Geometry", theory: false, questions: false },
+                { name: "Three-Dimensional Geometry", section: "Vectors & 3D Geometry", theory: false, questions: false },
+                { name: "Probability", section: "Probability", theory: false, questions: false },
+                { name: "Linear Programming", section: "Optimization", theory: false, questions: false },
+            ],
+            physics: [
+                { name: "Electric Charges and Fields", section: "Electrostatics", theory: false, questions: false },
+                { name: "Electrostatic Potential and Capacitance", section: "Electrostatics", theory: false, questions: false },
+                { name: "Current Electricity", section: "Current Electricity", theory: false, questions: false },
+                { name: "Ohm's Law and Kirchhoff's Laws", section: "Current Electricity", theory: false, questions: false },
+                { name: "Moving Charges and Magnetism", section: "Magnetic Effects & Magnetism", theory: false, questions: false },
+                { name: "Magnetism and Matter", section: "Magnetic Effects & Magnetism", theory: false, questions: false },
+                { name: "Electromagnetic Induction", section: "EMI & AC", theory: false, questions: false },
+                { name: "Alternating Current", section: "EMI & AC", theory: false, questions: false },
+                { name: "Electromagnetic Waves", section: "Electromagnetic Waves", theory: false, questions: false },
+                { name: "Ray Optics and Optical Instruments", section: "Optics", theory: false, questions: false },
+                { name: "Wave Optics", section: "Optics", theory: false, questions: false },
+                { name: "Dual Nature of Radiation and Matter", section: "Modern Physics", theory: false, questions: false },
+                { name: "Atoms", section: "Modern Physics", theory: false, questions: false },
+                { name: "Nuclei", section: "Modern Physics", theory: false, questions: false },
+                { name: "Semiconductor Electronics", section: "Electronic Devices", theory: false, questions: false },
+                { name: "Diodes, Transistors and Logic Gates", section: "Electronic Devices", theory: false, questions: false },
+            ],
+            chemistry: [
+                { name: "Solutions", section: "Physical Chemistry", theory: false, questions: false },
+                { name: "Raoult's Law and Colligative Properties", section: "Physical Chemistry", theory: false, questions: false },
+                { name: "Electrochemistry", section: "Physical Chemistry", theory: false, questions: false },
+                { name: "Conductivity, Nernst Equation and Fuel Cells", section: "Physical Chemistry", theory: false, questions: false },
+                { name: "Chemical Kinetics", section: "Physical Chemistry", theory: false, questions: false },
+                { name: "Rate, Order, Molecularity and Arrhenius Equation", section: "Physical Chemistry", theory: false, questions: false },
+                { name: "d and f Block Elements", section: "Inorganic Chemistry", theory: false, questions: false },
+                { name: "Coordination Compounds", section: "Inorganic Chemistry", theory: false, questions: false },
+                { name: "Werner's Theory, VBT and Crystal Field Theory", section: "Inorganic Chemistry", theory: false, questions: false },
+                { name: "Haloalkanes and Haloarenes", section: "Organic Chemistry", theory: false, questions: false },
+                { name: "Alcohols, Phenols and Ethers", section: "Organic Chemistry", theory: false, questions: false },
+                { name: "Aldehydes, Ketones and Carboxylic Acids", section: "Organic Chemistry", theory: false, questions: false },
+                { name: "Amines", section: "Organic Chemistry", theory: false, questions: false },
+                { name: "Biomolecules", section: "Organic Chemistry", theory: false, questions: false },
+                { name: "Carbohydrates, Proteins, Vitamins and Nucleic Acids", section: "Organic Chemistry", theory: false, questions: false },
+            ]
+          }
+        };
+
+        // Load from localStorage or use default
+        const classLabels = { jee11: 'Class XI', jee12: 'Class XII' };
+        window.activeClass = localStorage.getItem('caffineActiveClass') || 'jee11';
+        window.getStorageKey = function(cls = window.activeClass) {
+            return cls === 'jee12' ? 'caffineJee12' : 'caffineJee11';
+        };
+        function loadClassData(cls) {
+            return JSON.parse(localStorage.getItem(window.getStorageKey(cls)) || 'null') || JSON.parse(JSON.stringify(defaultDataByClass[cls]));
+        }
+        window.appData = loadClassData(window.activeClass);
+
+        // ── THEME ──────────────────────────────────────────────────────
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        window.toggleTheme = function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        };
+
+        // ── COLOR MAP ──────────────────────────────────────────────────
+        const subjectMeta = {
+            math:      { color: '#ef4444', barId: 'math-bar',      textId: 'math-text',      listId: 'math-list',      labelColorClass: 'text-math' },
+            physics:   { color: '#22c55e', barId: 'physics-bar',   textId: 'physics-text',   listId: 'physics-list',   labelColorClass: 'text-physics' },
+            chemistry: { color: '#a855f7', barId: 'chemistry-bar', textId: 'chemistry-text', listId: 'chemistry-list', labelColorClass: 'text-chemistry' },
+        };
+
+        // ── RENDER ─────────────────────────────────────────────────────
+        function renderList(subject) {
+            const meta = subjectMeta[subject];
+            const container = document.getElementById(meta.listId);
+            container.innerHTML = '';
+            if (!window.appData[subject]) return;
+
+            let lastSection = null;
+
+            window.appData[subject].forEach((chapter, index) => {
+                // Section divider
+                if (chapter.section && chapter.section !== lastSection) {
+                    lastSection = chapter.section;
+                    const div = document.createElement('div');
+                    div.className = 'px-3 pt-3 pb-1';
+                    div.innerHTML = `<span class="subsection-label" style="color:${meta.color};opacity:0.7;">${chapter.section}</span>`;
+                    container.appendChild(div);
+                }
+
+                const isDone = chapter.theory && chapter.questions;
+                const row = document.createElement('div');
+                row.className = 'chapter-row flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl';
+
+                row.innerHTML = `
+                    <span class="chapter-name flex-1 min-w-0 truncate ${isDone ? 'line-through opacity-40' : 'text-slate-700 dark:text-gray-300'} transition-all">${chapter.name}</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        ${makeCheckbox(subject, index, 'theory', chapter.theory, meta.color, 'T')}
+                        ${makeCheckbox(subject, index, 'questions', chapter.questions, meta.color, 'Q')}
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function makeCheckbox(subject, index, type, checked, color, label) {
+            return `
+                <label class="check-wrap cursor-pointer flex items-center gap-1 group">
+                    <span class="tag opacity-40 group-hover:opacity-80 transition-opacity" style="color:${color}">${label}</span>
+                    <div class="relative w-4 h-4">
+                        <input type="checkbox" class="hidden" onchange="updateStatus('${subject}',${index},'${type}')" ${checked ? 'checked' : ''}>
+                        <div class="check-box w-full h-full rounded-[5px] border flex items-center justify-center transition-all
+                            ${checked ? '' : 'border-slate-200 dark:border-white/10'}"
+                            style="${checked ? `background:${color};border-color:${color}` : ''}">
+                            <svg class="w-2.5 h-2.5 ${checked ? 'opacity-100' : 'opacity-0'} text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </label>
+            `;
+        }
+
+        // ── UPDATE ─────────────────────────────────────────────────────
+        window.updateStatus = function(subject, index, type) {
+            window.appData[subject][index][type] = !window.appData[subject][index][type];
+            localStorage.setItem(window.getStorageKey(), JSON.stringify(window.appData));
+            if (window.saveToCloud) window.saveToCloud();
+            renderList(subject);
+            calculateStats();
+        };
+
+        function updateClassUI() {
+            const label = classLabels[window.activeClass] || 'Class XI';
+            document.getElementById('hero-class-label').innerText = label;
+            document.getElementById('header-class-label').innerText = label;
+            document.getElementById('tab-jee11').classList.toggle('active', window.activeClass === 'jee11');
+            document.getElementById('tab-jee12').classList.toggle('active', window.activeClass === 'jee12');
+        }
+
+        window.setActiveClass = function(cls) {
+            if (!defaultDataByClass[cls] || cls === window.activeClass) return;
+            localStorage.setItem(window.getStorageKey(), JSON.stringify(window.appData));
+            if (window.saveToCloud) window.saveToCloud();
+            window.activeClass = cls;
+            localStorage.setItem('caffineActiveClass', cls);
+            if (window.cloudSyllabus && window.cloudSyllabus[cls]) {
+                localStorage.setItem(window.getStorageKey(cls), JSON.stringify(window.cloudSyllabus[cls]));
+                window.appData = window.cloudSyllabus[cls];
+            } else {
+                window.appData = loadClassData(cls);
+            }
+            updateClassUI();
+            init();
+        };
+
+        // ── STATS ──────────────────────────────────────────────────────
+        window.calculateStats = function() {
+            let totalAll = 0, doneAll = 0;
+            const pct = {};
+
+            ['math', 'physics', 'chemistry'].forEach(sub => {
+                if (!window.appData[sub]) return;
+                const total = window.appData[sub].length * 2;
+                let done = 0;
+                window.appData[sub].forEach(ch => { if(ch.theory) done++; if(ch.questions) done++; });
+                pct[sub] = total === 0 ? 0 : Math.round((done / total) * 100);
+                totalAll += total;
+                doneAll += done;
+                document.getElementById(subjectMeta[sub].barId).style.width = `${pct[sub]}%`;
+                document.getElementById(subjectMeta[sub].textId).innerText = `${pct[sub]}%`;
+            });
+
+            const global = totalAll === 0 ? 0 : Math.round((doneAll / totalAll) * 100);
+            document.getElementById('global-progress').style.width = `${global}%`;
+            document.getElementById('global-percentage').innerText = `${global}%`;
+            document.getElementById('total-tasks-done').innerText = `${doneAll}/${totalAll}`;
+            document.getElementById('ring-pct').innerText = `${global}%`;
+
+            // Circular arcs — circumference = 2π×28 ≈ 175.93
+            // Each arc is drawn as a fraction of the full circle, stacked via dashoffset rotation trick
+            // We use a single-ring approach: each subject gets its own arc offset so they appear as segments
+            const C = 175.93;
+            const subjects3 = ['math', 'physics', 'chemistry'];
+            let cumulative = 0;
+            subjects3.forEach(sub => {
+                const arc = document.getElementById(`arc-${sub}`);
+                if (!arc) return;
+                const subTotal = window.appData[sub] ? window.appData[sub].length * 2 : 0;
+                let subDone = 0;
+                if (window.appData[sub]) window.appData[sub].forEach(ch => { if(ch.theory) subDone++; if(ch.questions) subDone++; });
+                const fraction = totalAll === 0 ? 0 : subDone / totalAll;
+                const segLen = fraction * C;
+                // offset = C - segLen, then rotate by cumulative angle via stroke-dashoffset trick with transform
+                arc.style.strokeDashoffset = C - segLen;
+                arc.style.transform = `rotate(${(cumulative / C) * 360}deg)`;
+                arc.style.transformOrigin = '36px 36px';
+                cumulative += segLen;
+            });
+
+            // Rank system
+            const rankEl = document.getElementById('user-rank');
+            if (global === 0)         rankEl.innerText = "Aspirant";
+            else if (global < 20)     rankEl.innerText = "Grinder";
+            else if (global < 40)     rankEl.innerText = "Scholar";
+            else if (global < 60)     rankEl.innerText = "Cracker";
+            else if (global < 80)     rankEl.innerText = "Topper";
+            else if (global < 100)    rankEl.innerText = "AIR Bound";
+            else {
+                rankEl.innerText = "AIR 1";
+                if (!sessionStorage.getItem('confettiShown')) {
+                    triggerConfetti();
+                    sessionStorage.setItem('confettiShown', 'true');
+                }
+            }
+
+            // Focus area — lagging subject
+            let minPct = 101, focusSub = "Balanced";
+            ['math', 'physics', 'chemistry'].forEach(sub => {
+                if (pct[sub] < minPct) { minPct = pct[sub]; focusSub = sub.charAt(0).toUpperCase() + sub.slice(1); }
+            });
+            if (pct.math === pct.physics && pct.physics === pct.chemistry && pct.math > 0) focusSub = "Consistent";
+            if (global === 100) focusSub = "All Done!";
+            document.getElementById('focus-area').innerText = focusSub;
+        };
+
+        function triggerConfetti() {
+            const end = Date.now() + 3000;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+            const rand = (a, b) => Math.random() * (b - a) + a;
+            const iv = setInterval(() => {
+                if (Date.now() > end) return clearInterval(iv);
+                const pc = 50 * ((end - Date.now()) / 3000);
+                confetti({ ...defaults, particleCount: pc, colors: ['#ef4444','#22c55e','#a855f7'], origin: { x: rand(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount: pc, colors: ['#ef4444','#22c55e','#a855f7'], origin: { x: rand(0.7, 0.9), y: Math.random() - 0.2 } });
+            }, 250);
+        }
+
+        // ── HERO SPLASH ────────────────────────────────────────────
+        const C_HERO = 452.39; // 2π×72
+
+        function updateHeroArcs() {
+            let totalAll = 0, doneAll = 0;
+            const subDones = {};
+            ['math', 'physics', 'chemistry'].forEach(sub => {
+                if (!window.appData[sub]) return;
+                const total = window.appData[sub].length * 2;
+                let done = 0;
+                window.appData[sub].forEach(ch => { if(ch.theory) done++; if(ch.questions) done++; });
+                subDones[sub] = done;
+                totalAll += total;
+                doneAll += done;
+            });
+            const global = totalAll === 0 ? 0 : Math.round((doneAll / totalAll) * 100);
+            document.getElementById('hero-pct').innerText = `${global}%`;
+            let cumulative = 0;
+            ['math', 'physics', 'chemistry'].forEach(sub => {
+                const arc = document.getElementById(`hero-arc-${sub}`);
+                if (!arc) return;
+                const fraction = totalAll === 0 ? 0 : (subDones[sub] || 0) / totalAll;
+                const segLen = fraction * C_HERO;
+                arc.style.strokeDashoffset = C_HERO - segLen;
+                arc.style.transform = `rotate(${(cumulative / C_HERO) * 360}deg)`;
+                arc.style.transformOrigin = '90px 90px';
+                cumulative += segLen;
+            });
+        }
+
+        // Lock scroll immediately so browser scroll restore can't fire
+        document.body.style.overflow = 'hidden';
+        history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+
+        window.dismissSplash = function() {
+            const splash = document.getElementById('hero-splash');
+            if (splash.classList.contains('dismissed')) return;
+            splash.classList.add('dismissed');
+            document.body.style.overflow = '';
+            document.getElementById('main-content').classList.add('visible');
+        };
+
+        // Only attach scroll listener after 800ms — safely past any browser scroll restore
+        setTimeout(() => {
+            window.addEventListener('scroll', dismissSplash, { passive: true, once: true });
+        }, 800);
+
+        // ── INIT ───────────────────────────────────────────────────────
+        window.init = function() {
+            updateClassUI();
+            ['math', 'physics', 'chemistry'].forEach(renderList);
+            calculateStats();
+            updateHeroArcs();
+        };
+
+        init();
+        // Trigger hero arcs after a short delay so CSS transition plays
+        setTimeout(updateHeroArcs, 120);
+    </script>
+</body>
+</html>
