@@ -427,33 +427,41 @@ body::before {
   .dt-date { margin-top: 0; font-size: 7px; }
 
   .dock {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     border-top: none;
+    flex-wrap: unset;
   }
   .tool {
-    flex: 1 1 calc(50% - 1px);
-    min-height: 54px;
-    font-size: 9px;
-    padding: 0 12px;
+    flex: unset;
+    min-height: 64px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0 16px;
     flex-direction: row;
     justify-content: flex-start;
-    gap: 10px;
+    gap: 14px;
+    border-right: 1.5px solid var(--rule-hard);
     border-bottom: 1.5px solid var(--rule-hard);
+    white-space: nowrap;
   }
-  .tool:nth-child(odd) { border-right: 1.5px solid var(--rule-hard); }
   .tool:nth-child(even) { border-right: none; }
+  .tool:nth-child(3), .tool:nth-child(4) { border-bottom: none; }
   .tool.ai {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
     justify-content: center;
-    border-bottom: none;
+    gap: 12px;
     border-right: none;
-    min-height: 48px;
+    border-bottom: none;
+    min-height: 52px;
     background: #00ff88;
     color: #0d0d0d;
+    font-size: 12px;
   }
-  .tool.ai .tool-mark { color: #0d0d0d; }
   .tool.ai::before { background: #0d0d0d; }
-  .tool-mark { font-size: 20px; }
+  .tool.ai .tool-mark { color: #0d0d0d; font-size: 26px; }
+  .tool-mark { font-size: 28px; line-height: 1; }
 }
 </style>
 </head>
