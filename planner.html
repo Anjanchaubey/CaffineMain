@@ -1065,6 +1065,8 @@ body.minimal-view .chat-panel {
           <option value="5">5 min</option>
           <option value="10" selected>10 min</option>
           <option value="15">15 min</option>
+          <option value="20">20 min</option>
+          <option value="25">25 min</option>
         </select>
       </div>
       <div class="field-group">
@@ -1073,6 +1075,7 @@ body.minimal-view .chat-panel {
           <option value="15">15 min</option>
           <option value="20" selected>20 min</option>
           <option value="30">30 min</option>
+          <option value="45">45 min</option>
         </select>
       </div>
       <div class="field-group">
@@ -1313,25 +1316,32 @@ let lastTimetableMeta = null;
 // Apply saved theme
 if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
 
-// Load saved timetable from localStorage for guests
-if (!currentUser) {
-  const saved = localStorage.getItem('lastTimetable');
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      generatedBlocks = data.blocks.map(b => ({
-        ...b,
-        timeObj: new Date(b.timeObj),
-        endObj: new Date(b.endObj)
-      }));
-      const startTime = new Date(data.startTime);
-      const endTime = new Date(data.endTime);
-      renderOutput(generatedBlocks, data.subject, startTime, endTime, data.stbMin);
-    } catch (e) {
-      console.error('Failed to load saved timetable', e);
+// ══════════════════════════════════════════
+// FIREBASE AUTH
+// ══════════════════════════════════════════
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  updateAuthUI();
+  if (user) {
+    loadUserTimetables();
+  } else {
+    // Only load from localStorage if not logged in
+    const saved = localStorage.getItem('lastTimetable');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data?.blocks?.length) {
+          generatedBlocks = data.blocks.map(b => ({
+            ...b,
+            timeObj: new Date(b.timeObj || b.timeDisplay),
+            endObj: new Date(b.endObj || b.endDisplay)
+          }));
+          renderOutput(generatedBlocks, data.subject, new Date(data.startTime), new Date(data.endTime), data.stbMin);
+        }
+      } catch (e) { console.error('Failed to load saved timetable', e); }
     }
   }
-}
+});
 
 // ══════════════════════════════════════════
 // PILL SELECTION
@@ -2051,13 +2061,8 @@ function exportToPDF() {
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ══════════════════════════════════════════
-// FIREBASE AUTH
+// FIREBASE SYNC
 // ══════════════════════════════════════════
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  updateAuthUI();
-  if (user) loadUserTimetables();
-});
 
 function showAuthModal() {
   document.getElementById('auth-modal').classList.add('visible');
@@ -2152,39 +2157,26 @@ function saveTimetable(blocks, subject, startTime, endTime, stbMin) {
   // Save to localStorage for all users
   localStorage.setItem('lastTimetable', JSON.stringify(data));
   
-  // Also save to Firebase if logged in
+  // Save to Firebase under a fixed key so it persists forever across devices
   if (currentUser) {
-    db.ref(`users/${currentUser.uid}/timetables/${Date.now()}`).set(data);
+    db.ref(`users/${currentUser.uid}/currentTimetable`).set(data);
   }
 }
 
 function loadUserTimetables() {
   if (!currentUser) return;
   
-  db.ref(`users/${currentUser.uid}/timetables`).limitToLast(1).on('value', snapshot => {
-    const data = snapshot.val();
-    if (!data) return;
+  db.ref(`users/${currentUser.uid}/currentTimetable`).once('value', snapshot => {
+    const latest = snapshot.val();
+    if (!latest?.blocks?.length) return;
     
-    const latest = Object.values(data)[0];
-    if (latest && latest.blocks) {
-      generatedBlocks = latest.blocks.map(b => ({
-        ...b,
-        timeObj: new Date(b.timeObj),
-        endObj: new Date(b.endObj)
-      }));
-      
-      const startTime = new Date(latest.startTime);
-      const endTime = new Date(latest.endTime);
-      
-      // Auto-display if not already showing output
-      if (!document.getElementById('screen-output').classList.contains('visible')) {
-        renderOutput(generatedBlocks, latest.subject, startTime, endTime, latest.stbMin);
-      } else {
-        renderTimeline(generatedBlocks);
-        renderTable(generatedBlocks);
-        renderMinimal(generatedBlocks);
-      }
-    }
+    generatedBlocks = latest.blocks.map(b => ({
+      ...b,
+      timeObj: new Date(b.timeObj || b.timeDisplay),
+      endObj: new Date(b.endObj || b.endDisplay)
+    }));
+    
+    renderOutput(generatedBlocks, latest.subject, new Date(latest.startTime), new Date(latest.endTime), latest.stbMin);
   });
 }
 
@@ -2303,47 +2295,60 @@ function toggleChat() {
 }
 
 function buildChatSystemPrompt() {
-  const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Guest';
-  const userEmail = currentUser ? currentUser.email : 'Not logged in';
+  const userName = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'Student';
 
-  let timetableContext = 'No timetable generated yet.';
+  let timetableContext = 'No timetable generated yet. Tell the user to generate one first.';
   if (generatedBlocks.length > 0) {
     const lines = generatedBlocks.map((b, i) =>
-      `${String(i+1).padStart(2,'0')}. [${b.type}] ${b.timeDisplay}\u2013${b.endDisplay} | ${b.title} | ${b.minutes}min${b.note ? ' | ' + b.note : ''}`
+      `${String(i+1).padStart(2,'0')}. [${b.type}] ${b.timeDisplay}-${b.endDisplay} | "${b.title}" | ${b.minutes}min | note: "${b.note || ''}"`
     ).join('\n');
     const totalMin = generatedBlocks.reduce((a,b) => a+b.minutes, 0);
-    const stbMin = generatedBlocks.filter(b=>b.type==='STB').reduce((a,b)=>a+b.minutes,0);
-    timetableContext = `Current timetable (${generatedBlocks.length} blocks, ${totalMin} min total, ${stbMin} min study):\n${lines}`;
+    const stbTotal = generatedBlocks.filter(b=>b.type==='STB').reduce((a,b)=>a+b.minutes,0);
+    const stbCount = generatedBlocks.filter(b=>b.type==='STB').length;
+    timetableContext = `CURRENT TIMETABLE — ${generatedBlocks.length} blocks | ${totalMin} min total | ${stbCount} study blocks (${stbTotal} min focus)\nStart: ${generatedBlocks[0].timeDisplay} | End: ${generatedBlocks[generatedBlocks.length-1].endDisplay}\n\n${lines}`;
   }
 
-  return `You are STB Assistant, an AI embedded inside the STB (Study Block Timetable) app.
+  return `You are STB Assistant — a smart, direct AI timetable editor built into the STB study app. You help ${userName} manage and edit their study timetable.
 
-USER CONTEXT:
-- Name: ${userName}
-- Email: ${userEmail}
-- Logged in: ${currentUser ? 'Yes' : 'No'}
-
-TIMETABLE CONTEXT:
 ${timetableContext}
 
-YOUR CAPABILITIES:
-1. Answer questions about the timetable
-2. Suggest improvements
-3. When the user asks to MODIFY the timetable, output a NEW timetable in this exact pipe-delimited format (one block per line, nothing else before/after the blocks):
+━━━ HOW TO RESPOND ━━━
+
+For QUESTIONS or ANALYSIS (e.g. "how much study time?", "is this good?"):
+→ Answer directly and concisely. Use the timetable data above.
+
+For ANY EDIT REQUEST (e.g. "make breaks shorter", "add a meal", "change block 3 title", "swap blocks", "remove the transition", "make it more intense"):
+→ First write 1 short sentence explaining what you changed.
+→ Then output the FULL updated timetable using EXACTLY this format:
+
 TIMETABLE_UPDATE_START
-TIME | TYPE | TITLE | MINUTES | NOTE
-...
+10:00 PM | STB | Core Concepts | 60 | Focus on theory
+11:00 PM | BREAK | Short Break | 10 | Rest your eyes
 TIMETABLE_UPDATE_END
 
-TYPE must be one of: STB, BREAK, MEAL, TRANSITION
-TIME values will be recalculated automatically \u2014 just use the original start time for the first block.
-Always include a brief friendly explanation BEFORE the TIMETABLE_UPDATE_START block.
+FORMAT RULES (CRITICAL — follow exactly):
+- Every line: TIME | TYPE | TITLE | MINUTES | NOTE
+- TYPE must be one of: STB, BREAK, MEAL, TRANSITION
+- TIME is just for reference — it gets recalculated automatically
+- MINUTES must be a plain integer (e.g. 60, not "60 min")
+- NOTE is short (max 6 words)
+- Include ALL blocks — do not skip any
+- Do NOT add headers, numbering, or extra text inside the update block
+- Do NOT wrap in code blocks or markdown
 
-RULES:
-- Be concise and friendly
-- Address the user by name when natural
-- If no timetable exists yet, encourage them to generate one first
-- Never make up data \u2014 only reference what's in the context above`;
+EDITING INTELLIGENCE:
+- "make breaks shorter/longer" → change all BREAK block minutes
+- "remove meal" → delete MEAL blocks
+- "add a meal break" → insert a MEAL block in the middle
+- "make it more intense" → reduce break durations, keep STB durations
+- "rename block X" → change that block's title
+- "swap block X and Y" → swap their positions
+- "change block 3 to 45 minutes" → update that block's minutes
+- "add a transition at the start" → insert TRANSITION block at beginning
+- Always preserve total session duration unless user explicitly asks to change it
+- Always keep times consistent (they auto-recalculate, so just keep minutes accurate)
+
+TONE: Confident, brief, helpful. No fluff. Address user as ${userName} occasionally.`;
 }
 
 function addChatMessage(role, text, pendingUpdate) {
@@ -2411,7 +2416,7 @@ async function sendChatMessage() {
   try {
     const messages = [
       { role: 'system', content: buildChatSystemPrompt() },
-      ...chatHistory.slice(-10)
+      ...chatHistory.slice(-14)
     ];
 
     const res = await puter.ai.chat(messages, { model: 'gpt-4o' });
@@ -2419,16 +2424,17 @@ async function sendChatMessage() {
 
     removeTypingIndicator();
 
-    const updateMatch = raw.match(/TIMETABLE_UPDATE_START\n([\s\S]*?)\nTIMETABLE_UPDATE_END/);
+    const updateMatch = raw.match(/TIMETABLE_UPDATE_START\r?\n([\s\S]*?)\r?\nTIMETABLE_UPDATE_END/);
     let displayText = raw.replace(/TIMETABLE_UPDATE_START[\s\S]*?TIMETABLE_UPDATE_END/g, '').trim();
     let pendingBlocks = null;
 
     if (updateMatch) {
       const startTime = generatedBlocks.length > 0 ? generatedBlocks[0].timeObj : new Date();
       pendingBlocks = parseBlocks(updateMatch[1], new Date(startTime), selectedSTB || 60);
+      if (!displayText) displayText = 'Done! Here’s your updated timetable — review and apply below.';
     }
 
-    addChatMessage('ai', displayText || 'Done! Check the update below.', pendingBlocks);
+    addChatMessage('ai', displayText || 'Done!', pendingBlocks);
     chatHistory.push({ role: 'assistant', content: raw });
 
   } catch (err) {
