@@ -1883,20 +1883,35 @@ function loadSavedTimetableData() {
   }
 }
 
-function viewInterface() {
+async function viewInterface() {
+  if (!currentUser) {
+    alert('Generate a timetable first, then open the view interface.');
+    return;
+  }
+
+  try {
+    const snapshot = await db.ref(`users/${currentUser.uid}/currentTimetable`).once('value');
+    const latest = snapshot.val();
+    
+    if (latest?.blocks?.length) {
+      generatedBlocks = latest.blocks.map(b => ({
+        ...b,
+        timeObj: new Date(b.timeObj),
+        endObj: new Date(b.endObj)
+      }));
+      renderOutput(generatedBlocks, latest.subject, new Date(latest.startTime), new Date(latest.endTime), latest.stbMin);
+      return;
+    }
+  } catch (err) {
+    console.error('Failed to load timetable:', err);
+  }
+
   if (generatedBlocks.length) {
     document.getElementById('screen-input').style.display = 'none';
     document.getElementById('screen-output').classList.add('visible');
     renderTimeline(generatedBlocks);
     renderTable(generatedBlocks);
     renderMinimal(generatedBlocks);
-    return;
-  }
-
-  const saved = loadSavedTimetableData();
-  if (saved) {
-    generatedBlocks = saved.blocks;
-    renderOutput(generatedBlocks, saved.subject, saved.startTime, saved.endTime, saved.stbMin);
     return;
   }
 
@@ -2144,7 +2159,7 @@ function saveTimetable(blocks, subject, startTime, endTime, stbMin) {
 
 function loadUserTimetables() {
   if (!currentUser) return;
-  db.ref(`users/${currentUser.uid}/currentTimetable`).on('value', snapshot => {
+  db.ref(`users/${currentUser.uid}/currentTimetable`).once('value', snapshot => {
     const latest = snapshot.val();
     if (!latest?.blocks?.length) return;
     generatedBlocks = latest.blocks.map(b => ({
@@ -2152,7 +2167,6 @@ function loadUserTimetables() {
       timeObj: new Date(b.timeObj),
       endObj: new Date(b.endObj)
     }));
-    renderOutput(generatedBlocks, latest.subject, new Date(latest.startTime), new Date(latest.endTime), latest.stbMin);
   });
 }
 
