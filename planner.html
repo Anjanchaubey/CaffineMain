@@ -1315,6 +1315,7 @@ let lastTimetableMeta = null;
 
 // Apply saved theme
 if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
+localStorage.removeItem('lastTimetable');
 
 // ══════════════════════════════════════════
 // FIREBASE AUTH
@@ -1324,22 +1325,6 @@ auth.onAuthStateChanged(user => {
   updateAuthUI();
   if (user) {
     loadUserTimetables();
-  } else {
-    // Only load from localStorage if not logged in
-    const saved = localStorage.getItem('lastTimetable');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        if (data?.blocks?.length) {
-          generatedBlocks = data.blocks.map(b => ({
-            ...b,
-            timeObj: new Date(b.timeObj || b.timeDisplay),
-            endObj: new Date(b.endObj || b.endDisplay)
-          }));
-          renderOutput(generatedBlocks, data.subject, new Date(data.startTime), new Date(data.endTime), data.stbMin);
-        }
-      } catch (e) { console.error('Failed to load saved timetable', e); }
-    }
   }
 });
 
@@ -2145,6 +2130,7 @@ function updateAuthUI() {
 // FIREBASE SYNC
 // ══════════════════════════════════════════
 function saveTimetable(blocks, subject, startTime, endTime, stbMin) {
+  if (!currentUser) return;
   const data = {
     blocks,
     subject,
@@ -2153,29 +2139,19 @@ function saveTimetable(blocks, subject, startTime, endTime, stbMin) {
     stbMin,
     timestamp: Date.now()
   };
-  
-  // Save to localStorage for all users
-  localStorage.setItem('lastTimetable', JSON.stringify(data));
-  
-  // Save to Firebase under a fixed key so it persists forever across devices
-  if (currentUser) {
-    db.ref(`users/${currentUser.uid}/currentTimetable`).set(data);
-  }
+  db.ref(`users/${currentUser.uid}/currentTimetable`).set(data);
 }
 
 function loadUserTimetables() {
   if (!currentUser) return;
-  
-  db.ref(`users/${currentUser.uid}/currentTimetable`).once('value', snapshot => {
+  db.ref(`users/${currentUser.uid}/currentTimetable`).on('value', snapshot => {
     const latest = snapshot.val();
     if (!latest?.blocks?.length) return;
-    
     generatedBlocks = latest.blocks.map(b => ({
       ...b,
-      timeObj: new Date(b.timeObj || b.timeDisplay),
-      endObj: new Date(b.endObj || b.endDisplay)
+      timeObj: new Date(b.timeObj),
+      endObj: new Date(b.endObj)
     }));
-    
     renderOutput(generatedBlocks, latest.subject, new Date(latest.startTime), new Date(latest.endTime), latest.stbMin);
   });
 }
